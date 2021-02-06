@@ -32,9 +32,9 @@ equal to the current value
 (current price multiplied by number of shares currently owned).
 
 ## Dependencies
-* [libcs-math](/XavierAP/libcs-math)
+* [libcs-math](https://github.com/XavierAP/libcs-math)
 is used to calculate the returns,
 by Newton-Raphson's iterative method.
 
-* [libcs-sqlite](/XavierAP/libcs-sqlite)
+* [libcs-sqlite](https://github.com/XavierAP/libcs-sqlite)
 is used for SQLite database implementation.
