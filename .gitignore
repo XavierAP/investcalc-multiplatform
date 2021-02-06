@@ -2,11 +2,11 @@
 **/__*
 
 ### Visual Studio
-**/.vs/*
+**/.vs/
 bin/
 obj/
 packages/
 *.user
 *.resx
-Properties/Resources.*
-
+**/Properties/Resources.*
+**/Properties/PublishProfiles/
