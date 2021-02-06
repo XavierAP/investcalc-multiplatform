@@ -37,6 +37,4 @@ is used to calculate the returns,
 by Newton-Raphson's iterative method.
 
 * [libcs-sqlite](/XavierAP/libcs-sqlite)
-is used by
-the [**`Data`**](Data.cs) class
-for SQLite database implementation.
+is used for SQLite database implementation.
