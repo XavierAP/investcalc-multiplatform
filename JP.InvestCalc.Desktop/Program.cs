@@ -15,7 +15,7 @@ namespace JP.InvestCalc
 			Application.SetHighDpiMode(HighDpiMode.SystemAware);
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
-			Application.Run(new FormMain(model));
+			Application.Run(new FormMain(model, new DataBindings(model)));
 		}
 
 		private static string GetDataFolder()

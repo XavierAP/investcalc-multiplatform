@@ -183,8 +183,7 @@ namespace JP.InvestCalc
 					try { n = model.ImportFlows(dlg.Content, csvSeparator); }
 					catch(DataException err)
 					{
-						MessageBox.Show(err.Message, Config.AppName,
-							MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+						err.Display();
 						n = -1;
 					}
 				}

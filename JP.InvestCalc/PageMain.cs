@@ -166,7 +166,7 @@ namespace JP.InvestCalc
 
 		private void FooHistory(object sender, EventArgs ea)
 		{
-			var flows = model.Flows.GetFlowEditor().GetFlowDetailsOrdered(new[] { "ASML" },
+			var flows = model.Data.GetFlowEditor().GetFlowDetailsOrdered(new[] { "ASML" },
 				new DateTime(2000, 1, 1), DateTime.Now
 				).ToArray();
 		}

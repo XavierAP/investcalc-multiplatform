@@ -12,7 +12,7 @@ namespace JP.InvestCalc
 	internal partial class FormOp :Form
 	{
 		private readonly Operation opCurrent;
-		private readonly Dictionary<string, double> portfolio;
+		private readonly IReadOnlyDictionary<string, double> portfolio;
 
 		public string StockName   => txtStock.Text;
 		public double Shares  => (double)(opCurrent.SharesMinus ? -numShares.Value : numShares.Value);
@@ -20,7 +20,7 @@ namespace JP.InvestCalc
 		public DateTime Date  => pickDate.Value;
 		public string Comment => txtComment.Text;
 
-		internal FormOp(Operation op, Dictionary<string, double> portfolio)
+		internal FormOp(Operation op, IReadOnlyDictionary<string, double> portfolio)
 		{
 			Debug.Assert(op != null && portfolio != null);
 			this.opCurrent = op;

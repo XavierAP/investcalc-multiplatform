@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\libs_NET\JP.SQLite\JP.SQLite.WinForms\JP.SQLite.WinForms.csproj" />
     <ProjectReference Include="..\JP.InvestCalc_Model\InvestCalc_model.csproj" />
   </ItemGroup>
 

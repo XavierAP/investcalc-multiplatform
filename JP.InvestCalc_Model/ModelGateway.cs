@@ -6,10 +6,8 @@ namespace JP.InvestCalc
 	public class ModelGateway
 	{
 		public Calculator Calculator { get; }
-		public FlowData Flows { get; }
+		public DataFacade Data { get; }
 		public PortfolioData Portfolio { get; }
-
-		public string DataFilePath { get; }
 
 		internal ViewUpdater Display { get; }
 
@@ -18,12 +16,11 @@ namespace JP.InvestCalc
 			if(string.IsNullOrWhiteSpace(dataDirectory))
 				dataDirectory = string.Empty;
 
-			DataFilePath = Path.Combine(dataDirectory, Config.DataFileName);
-			var database = new Database(DataFilePath);
+			var database = new Database(Path.Combine(dataDirectory, Config.DataFileName));
 
 			Calculator = new Calculator(database);
 			Display = new ViewUpdater(Calculator);
-			Flows = new FlowData(database);
+			Data = new DataFacade(database);
 			Portfolio = new PortfolioData(Display, database, priceAPILicense);
 		}
 	}

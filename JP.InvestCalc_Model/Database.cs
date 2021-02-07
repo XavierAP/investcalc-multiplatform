@@ -11,13 +11,17 @@ namespace JP.InvestCalc
 {
 	class Database
 	{
-		private readonly SQLiteConnector connection;
+		public string FilePath { get; }
+		private readonly SQLiteConnector Connection;
 
 		public bool IsPortfolioChanged { get; private set; } = true;
 
+		public const string QueryStocks = "SELECT * FROM Stocks";
+
 		public Database(string dataFile)
 		{
-			connection = File.Exists(dataFile) ?
+			FilePath = dataFile;
+			Connection = File.Exists(dataFile) ?
 				new SQLiteConnector(dataFile, true) :
 				CreateEmptyDatabase(dataFile) ;
 		}
@@ -32,7 +36,7 @@ namespace JP.InvestCalc
 
 		public int ImportFlows(string csv, string separator)
 		{
-			var n = new DataImporter(connection).ImportFlows(csv, separator);
+			var n = new DataImporter(Connection).ImportFlows(csv, separator);
 			IsPortfolioChanged = true;
 			return n;
 		}
@@ -40,7 +44,7 @@ namespace JP.InvestCalc
 		public IEnumerable<(string StockName, double TotalShares)>
 		GetPortfolio()
 		{
-			using(var table = connection.Select(
+			using(var table = Connection.Select(
 @"SELECT Stocks.name, total(Flows.shares) as shares
 from Stocks left join Flows
 on Flows.stock = Stocks.id
@@ -60,7 +64,7 @@ order by name"))
 		public IEnumerable<(string Name, string Code)>
 		GetFetchCodes(IEnumerable<string> stockNames)
 		{
-			using(var table = connection.Select(
+			using(var table = Connection.Select(
 $@"SELECT name, fetchCodes
 from Stocks
 where {(stockNames==null ? null :
@@ -94,7 +98,7 @@ $@"INSERT into Flows values (
 {shares}, {money},
 {(string.IsNullOrWhiteSpace(comment) ? "NULL" : $"'{comment}'")}
 )");
-			connection.Write(sql);
+			Connection.Write(sql);
 		}
 
 
@@ -110,7 +114,7 @@ from Flows, Stocks ON Flows.stock = Stocks.id
 					from name in stockNames
 					select $"name = '{name}'"));
 
-			using(var table = connection.Select(sql.ToString()))
+			using(var table = Connection.Select(sql.ToString()))
 				return from DataRow record in table.Rows select (
 					(double)record[0],
 					new DateTime((long)record[1], DateTimeKind.Utc) );
@@ -139,7 +143,7 @@ from Flows, Stocks ON Flows.stock = Stocks.id
 
 			sql.Append("order by utcDate, shares DESC"); // TL;DR why order by shares DESC: corner case of several operations, with the same stock, in the same day. Chronological order may be lost because dates are rounded down to days; and it would create an absurd history, if the user deleted manually (see DeleteFlows, FormHistory.DoDelete and FormHistory.Table_CellMouseDown) a flow buying shares, so that later flows selling put the total owned into negative.
 
-			using(var table = connection.Select(sql.ToString()))
+			using(var table = Connection.Select(sql.ToString()))
 			{
 				foreach(DataRow record in table.Rows)
 				{
@@ -161,7 +165,7 @@ from Flows, Stocks ON Flows.stock = Stocks.id
 		{
 			if(ids == null || !ids.Any()) return;
 			var sql = $"DELETE from Flows where rowid IN ( {string.Join(", ", ids)} )";
-			connection.Write(sql);
+			Connection.Write(sql);
 			IsPortfolioChanged = true;
 		}
 

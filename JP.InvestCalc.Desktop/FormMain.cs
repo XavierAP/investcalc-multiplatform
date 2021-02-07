@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JP.SQLite;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,11 +9,13 @@ namespace JP.InvestCalc
 {
 	internal partial class FormMain : Form, IPortfolioView
 	{
-		private readonly ModelGateway model;
+		private readonly ModelGateway Model;
+		private readonly DataBindings ModelDataBindings; // Not from ModelGateway or in .Model assembly in general, because SQLiteBinder is not supported by Microsoft.Data.Sqlite (see branch 'microsoft' of repo 'libcs-sqlite' where JP.SQLite lives), which is the only one that works on mobile; and the .Model dll must be common to desktop and mobile/Xamarin apps.
 
-		internal FormMain(ModelGateway model)
+		internal FormMain(ModelGateway model, DataBindings modelDataBindings)
 		{
-			this.model = model;
+			this.Model = model;
+			this.ModelDataBindings = modelDataBindings;
 
 			InitializeComponent();
 			table.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
@@ -28,12 +31,12 @@ namespace JP.InvestCalc
 			mnuCost    .Click += (s, e) => OpRecord(Operation.Cost);
 
 			mnuHistory.Click += OpsHistory;
+			mnuData.Click += EditStockData;
 
 			table.CellValidating += ValidatingInput;
 			table.SelectionChanged += SelectionChanged;
 			SelectionChanged(null, null);
 		}
-
 
 		public void AddStock(string name, double shares, double? returnPer1Yearly)
 		{
@@ -72,7 +75,7 @@ namespace JP.InvestCalc
 		{
 			table.SuspendLayout();
 			table.Rows.Clear();
-			model.Portfolio.Load(this);
+			Model.Portfolio.Load(this);
 			TryCalcReturnAvg(table.Rows);
 			table.ResumeLayout();
 			
@@ -109,7 +112,7 @@ namespace JP.InvestCalc
 				var shares = (double)GetCell(ea.RowIndex, colShares).Value;
 				GetCell(ea.RowIndex, colValue).Value = Math.Round(price * shares, 2);
 				var stockName = (string)GetCell(ea.RowIndex, colStock).Value;
-				GetCell(ea.RowIndex, colReturn).Value = model.Calculator.CalcReturn(stockName, shares, price);
+				GetCell(ea.RowIndex, colReturn).Value = Model.Calculator.CalcReturn(stockName, shares, price);
 			}
 			else ea.Cancel = true;
 		}
@@ -152,7 +155,7 @@ namespace JP.InvestCalc
 			}
 
 			txtValue.Text = total.ToString("C2");
-			txtReturn.Text = model.Calculator.CalcReturnAvg(stocks, total)
+			txtReturn.Text = Model.Calculator.CalcReturnAvg(stocks, total)
 				.ToString(colReturn.DefaultCellStyle.Format);
 		}
 
@@ -176,7 +179,7 @@ namespace JP.InvestCalc
 			{
 				var ans = dlg.ShowDialog(this);
 				if(ans != DialogResult.OK) return;
-				model.Portfolio.AddShares(this, dlg.StockName, dlg.Shares, dlg.Total, dlg.Date, dlg.Comment);
+				Model.Portfolio.AddShares(this, dlg.StockName, dlg.Shares, dlg.Total, dlg.Date, dlg.Comment);
 			}
 		}
 
@@ -199,11 +202,38 @@ namespace JP.InvestCalc
 				++i;
 			}
 
-			var dataSource = model.Flows.GetFlowEditor();
+			var dataSource = Model.Data.GetFlowEditor();
 			using(var dlg = new FormHistoryFilter(dataSource, stockNames, multi>1?selected:null))
 				dlg.ShowDialog(this);
 
 			if(dataSource.IsDataChanged) FillTable();
+		}
+
+		
+		private void EditStockData(object sender, EventArgs ea)
+		{
+			var data = ModelDataBindings.GetStockBinding();
+			using var dlg = new SQLiteTableGridView(data, 1, 1)
+			{
+				AllowUserToAddRows = false,
+				AllowUserToDeleteRows = false,
+			};
+
+			retry:
+			var ans = dlg.ShowDialog(this);
+
+			if(ans == DialogResult.Cancel) return;
+			else if(ans == DialogResult.OK)
+			{
+				try { ModelDataBindings.Update(data); }
+				catch(Exception err)
+				{
+					err.Display();
+					goto retry;
+				}
+				FillTable();
+			}
+			else throw new InvalidProgramException("unreachable condition");
 		}
 
 

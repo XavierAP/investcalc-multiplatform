@@ -53,6 +53,8 @@
 			this.lblValueSelected = new System.Windows.Forms.Label();
 			this.lblValueTotal = new System.Windows.Forms.Label();
 			this.pnl = new System.Windows.Forms.Panel();
+			this.mnuData = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
 			this.pnlTab.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.table)).BeginInit();
 			this.mnuOperate.SuspendLayout();
@@ -62,7 +64,7 @@
 			// toolStripSeparator1
 			// 
 			this.toolStripSeparator1.Name = "toolStripSeparator1";
-			this.toolStripSeparator1.Size = new System.Drawing.Size(144, 6);
+			this.toolStripSeparator1.Size = new System.Drawing.Size(156, 6);
 			// 
 			// pnlTab
 			// 
@@ -155,6 +157,7 @@
 			this.table.Location = new System.Drawing.Point(4, 24);
 			this.table.Margin = new System.Windows.Forms.Padding(4);
 			this.table.Name = "table";
+			this.table.RowHeadersWidth = 51;
 			this.table.RowTemplate.Height = 24;
 			this.table.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
 			this.table.Size = new System.Drawing.Size(554, 339);
@@ -163,35 +166,40 @@
 			// colStock
 			// 
 			this.colStock.HeaderText = "Stock";
+			this.colStock.MinimumWidth = 6;
 			this.colStock.Name = "colStock";
 			this.colStock.ReadOnly = true;
 			// 
 			// colShares
 			// 
 			this.colShares.HeaderText = "Shares";
+			this.colShares.MinimumWidth = 6;
 			this.colShares.Name = "colShares";
 			this.colShares.ReadOnly = true;
 			// 
 			// colPrice
 			// 
 			this.colPrice.HeaderText = "Price";
+			this.colPrice.MinimumWidth = 6;
 			this.colPrice.Name = "colPrice";
 			// 
 			// colValue
 			// 
 			this.colValue.HeaderText = "Value";
+			this.colValue.MinimumWidth = 6;
 			this.colValue.Name = "colValue";
 			this.colValue.ReadOnly = true;
 			// 
 			// colReturn
 			// 
 			this.colReturn.HeaderText = "Yearly";
+			this.colReturn.MinimumWidth = 6;
 			this.colReturn.Name = "colReturn";
 			this.colReturn.ReadOnly = true;
 			// 
 			// mnuOperate
 			// 
-			this.mnuOperate.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.mnuOperate.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
 			this.mnuOperate.ImageScalingSize = new System.Drawing.Size(20, 20);
 			this.mnuOperate.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.mnuBuy,
@@ -199,39 +207,41 @@
             this.mnuDividend,
             this.mnuCost,
             this.toolStripSeparator1,
-            this.mnuHistory});
+            this.mnuHistory,
+            this.toolStripSeparator2,
+            this.mnuData});
 			this.mnuOperate.Name = "mnuOperate";
-			this.mnuOperate.Size = new System.Drawing.Size(148, 150);
+			this.mnuOperate.Size = new System.Drawing.Size(160, 184);
 			// 
 			// mnuBuy
 			// 
 			this.mnuBuy.Name = "mnuBuy";
-			this.mnuBuy.Size = new System.Drawing.Size(147, 28);
+			this.mnuBuy.Size = new System.Drawing.Size(159, 28);
 			this.mnuBuy.Text = "Buy";
 			// 
 			// mnuSell
 			// 
 			this.mnuSell.Name = "mnuSell";
-			this.mnuSell.Size = new System.Drawing.Size(147, 28);
+			this.mnuSell.Size = new System.Drawing.Size(159, 28);
 			this.mnuSell.Text = "Sell";
 			// 
-			// mnuDiv
+			// mnuDividend
 			// 
-			this.mnuDividend.Name = "mnuDiv";
-			this.mnuDividend.Size = new System.Drawing.Size(147, 28);
+			this.mnuDividend.Name = "mnuDividend";
+			this.mnuDividend.Size = new System.Drawing.Size(159, 28);
 			this.mnuDividend.Text = "Dividend";
 			// 
 			// mnuCost
 			// 
 			this.mnuCost.Name = "mnuCost";
-			this.mnuCost.Size = new System.Drawing.Size(147, 28);
+			this.mnuCost.Size = new System.Drawing.Size(159, 28);
 			this.mnuCost.Text = "Cost";
 			// 
 			// mnuHistory
 			// 
 			this.mnuHistory.Name = "mnuHistory";
-			this.mnuHistory.Size = new System.Drawing.Size(147, 28);
-			this.mnuHistory.Text = "History...";
+			this.mnuHistory.Size = new System.Drawing.Size(159, 28);
+			this.mnuHistory.Text = "History";
 			// 
 			// txtValueSelected
 			// 
@@ -298,13 +308,24 @@
 			this.pnl.Size = new System.Drawing.Size(582, 453);
 			this.pnl.TabIndex = 0;
 			// 
+			// mnuData
+			// 
+			this.mnuData.Name = "mnuData";
+			this.mnuData.Size = new System.Drawing.Size(159, 28);
+			this.mnuData.Text = "Stock data";
+			// 
+			// toolStripSeparator2
+			// 
+			this.toolStripSeparator2.Name = "toolStripSeparator2";
+			this.toolStripSeparator2.Size = new System.Drawing.Size(156, 6);
+			// 
 			// FormMain
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 20F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(582, 453);
 			this.Controls.Add(this.pnl);
-			this.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
 			this.Margin = new System.Windows.Forms.Padding(4);
 			this.MinimumSize = new System.Drawing.Size(500, 400);
 			this.Name = "FormMain";
@@ -345,6 +366,8 @@
 		private System.Windows.Forms.DataGridViewTextBoxColumn colReturn;
 		private System.Windows.Forms.ToolStripMenuItem mnuHistory;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+		private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+		private System.Windows.Forms.ToolStripMenuItem mnuData;
 	}
 }
 

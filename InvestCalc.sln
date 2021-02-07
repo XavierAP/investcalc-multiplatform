@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InvestCalc.iOS", "JP.Invest
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InvestCalc_mobile", "JP.InvestCalc\InvestCalc_mobile.csproj", "{3507798F-C0DC-4C7A-9262-A72133C0CB26}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JP.SQLite", "..\libs_NET\JP.SQLite\JP.SQLite.csproj", "{E7A52FC2-F5C5-427F-B2B9-16D122127A3A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JP.SQLite", "..\libs_NET\JP.SQLite\JP.SQLite\JP.SQLite.csproj", "{E7A52FC2-F5C5-427F-B2B9-16D122127A3A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JP.Maths", "..\libs_NET\JP.Maths\JP.Maths.csproj", "{68F43023-CD7D-4159-9353-9D347AC6A784}"
 EndProject
@@ -21,6 +21,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InvestCalc_desktop", "JP.InvestCalc.Desktop\InvestCalc_desktop.csproj", "{AA8752B6-A040-40A3-B9E4-E9DD9812DD5B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JP.SQLite.WinForms", "..\libs_NET\JP.SQLite\JP.SQLite.WinForms\JP.SQLite.WinForms.csproj", "{BA052623-60E0-4FB5-841B-560BBDADB5D0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -133,6 +135,18 @@ Global
 		{AA8752B6-A040-40A3-B9E4-E9DD9812DD5B}.Release|iPhone.Build.0 = Release|Any CPU
 		{AA8752B6-A040-40A3-B9E4-E9DD9812DD5B}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
 		{AA8752B6-A040-40A3-B9E4-E9DD9812DD5B}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
+		{BA052623-60E0-4FB5-841B-560BBDADB5D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA052623-60E0-4FB5-841B-560BBDADB5D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA052623-60E0-4FB5-841B-560BBDADB5D0}.Debug|iPhone.ActiveCfg = Debug|Any CPU
+		{BA052623-60E0-4FB5-841B-560BBDADB5D0}.Debug|iPhone.Build.0 = Debug|Any CPU
+		{BA052623-60E0-4FB5-841B-560BBDADB5D0}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{BA052623-60E0-4FB5-841B-560BBDADB5D0}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
+		{BA052623-60E0-4FB5-841B-560BBDADB5D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA052623-60E0-4FB5-841B-560BBDADB5D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA052623-60E0-4FB5-841B-560BBDADB5D0}.Release|iPhone.ActiveCfg = Release|Any CPU
+		{BA052623-60E0-4FB5-841B-560BBDADB5D0}.Release|iPhone.Build.0 = Release|Any CPU
+		{BA052623-60E0-4FB5-841B-560BBDADB5D0}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
+		{BA052623-60E0-4FB5-841B-560BBDADB5D0}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
