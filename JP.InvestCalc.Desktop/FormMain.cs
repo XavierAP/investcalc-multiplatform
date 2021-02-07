@@ -213,27 +213,23 @@ namespace JP.InvestCalc
 		private void EditStockData(object sender, EventArgs ea)
 		{
 			var data = ModelDataBindings.GetStockBinding();
-			using var dlg = new SQLiteTableGridView(data, 1, 1)
+			using var dlg = new SQLiteTableGridView(data, () => ModelDataBindings.Update(data))
 			{
+				Text = "Stock data",
 				AllowUserToAddRows = false,
 				AllowUserToDeleteRows = false,
+				NumberOfHiddenColumns = 1,
 			};
 
 			retry:
 			var ans = dlg.ShowDialog(this);
 
-			if(ans == DialogResult.Cancel) return;
+			if(ans == DialogResult.Cancel)
+				return;
 			else if(ans == DialogResult.OK)
-			{
-				try { ModelDataBindings.Update(data); }
-				catch(Exception err)
-				{
-					err.Display();
-					goto retry;
-				}
 				FillTable();
-			}
-			else throw new InvalidProgramException("unreachable condition");
+			else
+				goto retry;
 		}
 
 
