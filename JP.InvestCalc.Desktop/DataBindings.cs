@@ -4,7 +4,7 @@ using System.Data;
 
 namespace JP.InvestCalc
 {
-	class DataBindings
+	class DataBindings : IDisposable
 	{
 		public DataTable GetStockBinding() => BinderStocks.DataTable;
 
@@ -16,12 +16,11 @@ namespace JP.InvestCalc
 				throw new InvalidOperationException($"{nameof(DataBindings)}.{nameof(Update)} must be called with an object previously returned by this same {nameof(DataBindings)} object.");
 		}
 
-		public DataBindings(ModelGateway model, byte numOfReadOnlyCols = 1)
+		public void Dispose() => BinderStocks.Dispose();
+
+		internal DataBindings(ModelGateway model)
 		{
-			BinderStocks = new SQLiteBinder(
-				model.Data.FilePath,
-				model.Data.QueryStocks,
-				numOfReadOnlyCols);
+			BinderStocks = new SQLiteBinder(model.Data.FilePath, model.Data.QueryStocks);
 		}
 
 		readonly SQLiteBinder BinderStocks;

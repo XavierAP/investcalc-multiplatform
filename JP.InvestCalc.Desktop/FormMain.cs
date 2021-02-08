@@ -1,5 +1,4 @@
-﻿using JP.SQLite;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,10 +11,10 @@ namespace JP.InvestCalc
 		private readonly ModelGateway Model;
 		private readonly DataBindings ModelDataBindings; // Not from ModelGateway or in .Model assembly in general, because SQLiteBinder is not supported by Microsoft.Data.Sqlite (see branch 'microsoft' of repo 'libcs-sqlite' where JP.SQLite lives), which is the only one that works on mobile; and the .Model dll must be common to desktop and mobile/Xamarin apps.
 
-		internal FormMain(ModelGateway model, DataBindings modelDataBindings)
+		internal FormMain(ModelGateway model)
 		{
 			this.Model = model;
-			this.ModelDataBindings = modelDataBindings;
+			this.ModelDataBindings = new DataBindings(model);
 
 			InitializeComponent();
 			table.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
@@ -36,6 +35,8 @@ namespace JP.InvestCalc
 			table.CellValidating += ValidatingInput;
 			table.SelectionChanged += SelectionChanged;
 			SelectionChanged(null, null);
+
+			Disposed += (s,e) => ModelDataBindings.Dispose();
 		}
 
 		public void AddStock(string name, double shares, double? returnPer1Yearly)
@@ -213,7 +214,7 @@ namespace JP.InvestCalc
 		private void EditStockData(object sender, EventArgs ea)
 		{
 			var data = ModelDataBindings.GetStockBinding();
-			using var dlg = new SQLiteTableGridView(data, () => ModelDataBindings.Update(data))
+			using var dlg = new FormStockData(data, () => ModelDataBindings.Update(data))
 			{
 				Text = "Stock data",
 				AllowUserToAddRows = false,
