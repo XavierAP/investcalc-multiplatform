@@ -50,7 +50,7 @@ namespace JP.InvestCalc
 			tableLayoutPanel1.Name = "tableLayoutPanel1";
 			tableLayoutPanel1.RowCount = 1;
 			tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			tableLayoutPanel1.Size = new System.Drawing.Size(382, 60);
+			tableLayoutPanel1.Size = new System.Drawing.Size(398, 60);
 			tableLayoutPanel1.TabIndex = 0;
 			// 
 			// ButtonCancel
@@ -85,7 +85,7 @@ namespace JP.InvestCalc
 			this.ButtonSave.Text = "Save";
 			this.ButtonSave.UseVisualStyleBackColor = true;
 			// 
-			// SQLiteTableGridView
+			// FormStockData
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -94,10 +94,11 @@ namespace JP.InvestCalc
 			this.Controls.Add(tableLayoutPanel1);
 			this.MinimizeBox = false;
 			this.MinimumSize = new System.Drawing.Size(400, 400);
-			this.Name = "SQLiteTableGridView";
+			this.Name = "FormStockData";
 			this.ShowIcon = false;
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+			this.Text = "Stock data";
 			tableLayoutPanel1.ResumeLayout(false);
 			tableLayoutPanel1.PerformLayout();
 			this.ResumeLayout(false);

@@ -13,8 +13,8 @@ namespace JP.InvestCalc
 
 		internal FormMain(ModelGateway model)
 		{
-			this.Model = model;
-			this.ModelDataBindings = new DataBindings(model);
+			Model = model;
+			ModelDataBindings = new DataBindings(model);
 
 			InitializeComponent();
 			table.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
@@ -214,13 +214,7 @@ namespace JP.InvestCalc
 		private void EditStockData(object sender, EventArgs ea)
 		{
 			var data = ModelDataBindings.GetStockBinding();
-			using var dlg = new FormStockData(data, () => ModelDataBindings.Update(data))
-			{
-				Text = "Stock data",
-				AllowUserToAddRows = false,
-				AllowUserToDeleteRows = false,
-				NumberOfHiddenColumns = 1,
-			};
+			using var dlg = new FormStockData(data, () => ModelDataBindings.Update(data));
 
 			retry:
 			var ans = dlg.ShowDialog(this);
