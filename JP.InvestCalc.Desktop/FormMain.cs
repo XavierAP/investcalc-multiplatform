@@ -116,6 +116,8 @@ namespace JP.InvestCalc
 				GetCell(ea.RowIndex, colReturn).Value = Model.Calculator.CalcReturn(stockName, shares, price);
 			}
 			else ea.Cancel = true;
+
+			TryCalcReturnAvg(table.Rows);
 		}
 
 		private bool ValidatePrice(double price)
@@ -127,6 +129,7 @@ namespace JP.InvestCalc
 			}
 			else return true;
 		}
+
 
 		private void TryCalcReturnAvg(IList dataGridViewRowsToAverage)
 		{
