@@ -19,13 +19,6 @@ namespace JP.InvestCalc
 				AllowUserToDeleteRows = false,
 			};
 			Table.BringToFront();
-			
-			Table.DataBindingComplete += (sender, eventArgs) =>
-			{
-				Table.NumberOfHiddenColumns = 1;
-			};
-
-			Table.DataSource = dataSource;
 
 			ButtonSave.Click += (s, ea) =>
 			{
