@@ -25,7 +25,6 @@ Can be imported and exported from/to CSV.
 
 * Calculate the equivalent yearly return of each investment,
 or all or several investments together.
-This is done after the user has entered the current price(s).
 The equivalent yearly return is defined as the interest/discount rate
 that makes the net present value of all cash flows
 equal to the current value
