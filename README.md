@@ -3,7 +3,7 @@ Program to keep track of investments and calculate their returns.
 Desktop version complete, mobile apps in progress.
 Both share same back-end source code (.NET and Xamarin).
 
-![Screenshot](https://i.postimg.cc/fykwTVkT/demo.png "Example of main window")
+![Screenshot](https://i.postimg.cc/mkZFF0qS/demo.png "Example of main window")
 
 ## Features
 * Register orders
@@ -16,8 +16,8 @@ Both share same back-end source code (.NET and Xamarin).
 (currently owned shares of every stock).
 
 * Retrieve stock prices from the Internet
-via <https://www.alphavantage.co>
-(license key needed, freely available).
+(via <https://www.alphavantage.co>
+-- license key needed, freely available).
 
 * Display and manipulate order history.
 Can filter by dates and stocks.
