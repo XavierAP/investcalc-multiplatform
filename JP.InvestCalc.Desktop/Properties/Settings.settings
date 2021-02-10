@@ -6,9 +6,9 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="csvSeparator" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">	</Value>
+      <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="apiLicense" Type="System.String" Scope="Application">
+    <Setting Name="ApiLicense" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
   </Settings>

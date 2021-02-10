@@ -10,7 +10,7 @@ namespace JP.InvestCalc
 		[STAThread]
 		static void Main()
 		{
-			var model = new ModelGateway(GetDataFolder(), Properties.Settings.Default.apiLicense);
+			var model = new ModelGateway(GetDataFolder(), Properties.Settings.Default.ApiLicense);
 
 			Application.SetHighDpiMode(HighDpiMode.SystemAware);
 			Application.EnableVisualStyles();
