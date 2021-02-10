@@ -14,17 +14,17 @@ namespace JP.InvestCalc
 			OnLicenseChanged();
 		}
 
-		private SQLiteGridView InitializeGridView(object dataSource, Action onSaveUpdateDataSource)
+		private void InitializeGridView(object dataSource, Action onSaveUpdateDataSource)
 		{
-			var Table = new SQLiteGridView(dataSource, 1)
+			var table = new SQLiteGridView(dataSource, 1)
 			{
 				AutoSize = true,
 				Dock = DockStyle.Fill,
 				AllowUserToAddRows = false,
 				AllowUserToDeleteRows = false,
 			};
-			layoutPanel.Controls.Add(Table, 0, 1);
-			layoutPanel.SetColumnSpan(Table, 2);
+			layoutPanel.Controls.Add(table, 0, 1);
+			layoutPanel.SetColumnSpan(table, 2);
 
 			btnSave.Click += (s, ea) =>
 			{
@@ -39,8 +39,6 @@ namespace JP.InvestCalc
 					DialogResult = DialogResult.Retry;
 				}
 			};
-
-			return Table;
 		}
 
 		private void InitializeLicenseInput()
