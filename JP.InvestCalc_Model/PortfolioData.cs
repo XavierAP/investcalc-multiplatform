@@ -63,8 +63,7 @@ namespace JP.InvestCalc
 
 		private void FetchPrices(IEnumerable<string> stocksToFetch, IPortfolioView view)
 		{
-			if(stocksToFetch.Any())
-				priceFetcher?.TryFetchPrices(database.GetFetchCodes(stocksToFetch), view);
+			priceFetcher.TryFetchPrices(database.GetFetchCodes(stocksToFetch), view);
 		}
 		private void FetchPrices(string nameToFetch, IPortfolioView view)
 			=> FetchPrices(new[] { nameToFetch }, view);
