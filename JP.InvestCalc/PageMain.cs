@@ -57,7 +57,7 @@ namespace JP.InvestCalc
 			}
 			catch(DbException)
 			{
-				File.Delete(model.DataFilePath);
+				File.Delete(model.Data.FilePath);
 				Environment.Exit(1);
 			}
 			AddButtons();
@@ -203,7 +203,7 @@ namespace JP.InvestCalc
 
 		private Task ExportDataFile() => Share.RequestAsync(new ShareFileRequest
 		{
-			File = new ShareFile(model.DataFilePath, "application/octet-stream")
+			File = new ShareFile(model.Data.FilePath, "application/octet-stream")
 		});
 
 		private async Task ImportDataFile()
@@ -212,7 +212,7 @@ namespace JP.InvestCalc
 			if(file == null) return;
 			using(var stream = file.GetStream())
 			{
-				var err = await Files.TryCopy(stream, model.DataFilePath);
+				var err = await Files.TryCopy(stream, model.Data.FilePath);
 				if(err == null)
 					RefreshPortfolio();
 				else
