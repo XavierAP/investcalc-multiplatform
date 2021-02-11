@@ -141,9 +141,9 @@ namespace JP.InvestCalc
 
 			double total = 0;
 			var stocks = new string[dataGridViewRowsToAverage.Count];
-			int i = 0;
-			foreach(DataGridViewRow row in dataGridViewRowsToAverage)
+			for(int i = 0; i < dataGridViewRowsToAverage.Count; i++)
 			{
+				var row = (DataGridViewRow)dataGridViewRowsToAverage[i];
 				object content = GetCell(row, colValue).Value;
 				if(content == null)
 				{
@@ -155,7 +155,7 @@ namespace JP.InvestCalc
 				}
 				else total += (double)content;
 
-				stocks[i++] = (string)GetCell(row, colStock).Value;
+				stocks[i] = (string)GetCell(row, colStock).Value;
 			}
 
 			txtValue.Text = total.ToString("C2");
@@ -195,15 +195,13 @@ namespace JP.InvestCalc
 			var selected = new bool[n];
 			var stockNames = new string[n];
 			int multi = 0;
-			int i = 0;
-			foreach(DataGridViewRow row in table.Rows)
+			for(int i = 0; i < table.Rows.Count; i++)
 			{
+				var row = table.Rows[i];
 				stockNames[i] = (string)GetCell(i, colStock).Value;
 
 				if(selected[i] = row.Selected)
 					++multi;
-
-				++i;
 			}
 
 			var dataSource = Model.Data.GetFlowEditor();
