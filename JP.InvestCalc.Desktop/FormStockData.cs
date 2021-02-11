@@ -14,7 +14,7 @@ namespace JP.InvestCalc
 			InitializeComponent();
 			InitializeGridView(dataSource, onSaveData);
 			InitializeLicenseInput();
-			OnLicenseChanged();
+			btnSearch.Click += (s, e) => MessageBox.Show("Not implemented yet :(");
 		}
 
 		private void InitializeGridView(object dataSource, Action onSaveData)
@@ -60,9 +60,9 @@ namespace JP.InvestCalc
 			txtLicense.KeyDown   += OnKeyDownWhileLicenseInput;
 			txtLicense.LostFocus += ConfirmLicenseInput;
 
-			btnSearch.Click += (s, e) => MessageBox.Show("Not implemented yet :(");
-
 			Disposed += (s,e) => txtLicense.Dispose();
+
+			OnLicenseChanged();
 		}
 
 		private void StartLicenseInput(object sender, EventArgs ea)
