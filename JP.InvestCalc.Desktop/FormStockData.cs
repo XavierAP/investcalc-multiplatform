@@ -6,15 +6,18 @@ namespace JP.InvestCalc
 {
 	internal partial class FormStockData : Form
 	{
-		public FormStockData(object dataSource, Action onSaveUpdateDataSource)
+		public FormStockData(object dataSource,
+			Action onSaveData,
+			Action<string> onSaveApiLicense)
 		{
+			this.onSaveApiLicense = onSaveApiLicense;
 			InitializeComponent();
-			InitializeGridView(dataSource, onSaveUpdateDataSource);
+			InitializeGridView(dataSource, onSaveData);
 			InitializeLicenseInput();
 			OnLicenseChanged();
 		}
 
-		private void InitializeGridView(object dataSource, Action onSaveUpdateDataSource)
+		private void InitializeGridView(object dataSource, Action onSaveData)
 		{
 			var table = new SQLiteGridView(dataSource, 1)
 			{
@@ -30,7 +33,7 @@ namespace JP.InvestCalc
 			{
 				try
 				{
-					onSaveUpdateDataSource();
+					onSaveData();
 					Close();
 				}
 				catch(Exception err)
@@ -39,6 +42,8 @@ namespace JP.InvestCalc
 					DialogResult = DialogResult.Retry;
 				}
 			};
+
+			Disposed += (s,e) => table.Dispose();
 		}
 
 		private void InitializeLicenseInput()
@@ -56,6 +61,8 @@ namespace JP.InvestCalc
 			txtLicense.LostFocus += ConfirmLicenseInput;
 
 			btnSearch.Click += (s, e) => MessageBox.Show("Not implemented yet :(");
+
+			Disposed += (s,e) => txtLicense.Dispose();
 		}
 
 		private void StartLicenseInput(object sender, EventArgs ea)
@@ -77,8 +84,7 @@ namespace JP.InvestCalc
 		private void ConfirmLicenseInput(object sender, EventArgs ea)
 		{
 			OnLicenseChanged();
-			Properties.Settings.Default.ApiLicense = txtLicense.Text;
-			Properties.Settings.Default.Save();
+			onSaveApiLicense(txtLicense.Text);
 			SwapControlsInTableLayoutPanel(layoutPanel, txtLicense, btnLicense);
 		}
 
@@ -95,6 +101,8 @@ namespace JP.InvestCalc
 
 		TextBox txtLicense;
 		string txtLicenseBackup;
+
+		readonly Action<string> onSaveApiLicense;
 
 		private static void SwapControlsInTableLayoutPanel(TableLayoutPanel parent,
 			Control current, Control substitute)

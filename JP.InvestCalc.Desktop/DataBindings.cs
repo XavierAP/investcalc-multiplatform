@@ -6,7 +6,7 @@ namespace JP.InvestCalc
 {
 	class DataBindings : IDisposable
 	{
-		public DataTable GetStockBinding() => BinderStocks.DataTable;
+		public DataTable StockBinding => BinderStocks.DataTable;
 
 		public void Update(DataTable binding)
 		{

@@ -216,18 +216,28 @@ namespace JP.InvestCalc
 		
 		private void EditStockData(object sender, EventArgs ea)
 		{
-			var data = ModelDataBindings.GetStockBinding();
-			using var dlg = new FormStockData(data, () => ModelDataBindings.Update(data));
+			var data = ModelDataBindings.StockBinding;
+			using var dlg = new FormStockData(data,
+				() => ModelDataBindings.Update(data),
+				OnSaveApiLicense);
+
+			bool newLicense = false;
 
 			retry:
 			var ans = dlg.ShowDialog(this);
-
-			if(ans == DialogResult.Cancel)
-				return;
-			else if(ans == DialogResult.OK)
-				FillTable();
-			else
+			
+			if(ans == DialogResult.Retry)
 				goto retry;
+			else if(ans == DialogResult.OK || newLicense)
+				FillTable();
+
+			void OnSaveApiLicense(string licenseKey)
+			{
+				newLicense = !string.IsNullOrWhiteSpace(licenseKey);
+				Model.Portfolio.PriceApiLicenseKey = licenseKey;
+				Properties.Settings.Default.ApiLicense = licenseKey;
+				Properties.Settings.Default.Save();
+			}
 		}
 
 

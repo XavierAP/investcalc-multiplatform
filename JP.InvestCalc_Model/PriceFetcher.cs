@@ -7,16 +7,17 @@ namespace JP.InvestCalc
 {
 	class PriceFetcher
 	{
+		public string ApiLicenseKey { get; set; }
+
 		private Task fetching = Task.CompletedTask;
 
-		private readonly string apiLicense;
 		private readonly PortfolioData portfolio;
 		private readonly ViewUpdater display;
 
-		public PriceFetcher(string apiLicense, PortfolioData portfolio, ViewUpdater display)
+		public PriceFetcher(string apiLicenseKey, PortfolioData portfolio, ViewUpdater display)
 		{
 			this.portfolio = portfolio;
-			this.apiLicense = apiLicense;
+			this.ApiLicenseKey = apiLicenseKey;
 			this.display = display;
 		}
 
@@ -24,7 +25,11 @@ namespace JP.InvestCalc
 			IEnumerable<(string Name, string Code)> stocksToFetch,
 			IPortfolioView view)
 		{
-			if(!stocksToFetch.Any()) return;
+			if(string.IsNullOrWhiteSpace(ApiLicenseKey))
+				return;
+			if(!stocksToFetch.Any())
+				return;
+
 			await fetching;
 			fetching = FetchPrices(stocksToFetch, view);
 			await fetching;
@@ -58,7 +63,7 @@ namespace JP.InvestCalc
 		private async Task<(string StockName, double Price, Exception Error)>
 		FetchPrice((string Name, string Code) stock)
 		{
-			var qt = new QuoteAlphaVantage(stock.Code, apiLicense);
+			var qt = new QuoteAlphaVantage(stock.Code, ApiLicenseKey);
 			if(qt == null)
 				return (stock.Name, 0, new Exception(
 					$"Invalid fetch code \"{stock.Code}\"."));

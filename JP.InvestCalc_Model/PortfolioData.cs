@@ -17,15 +17,19 @@ namespace JP.InvestCalc
 		private readonly PriceFetcher priceFetcher;
 		private readonly ViewUpdater display;
 
-		internal PortfolioData(ViewUpdater viewUpdater, Database database, string priceAPILicense)
+		internal PortfolioData(ViewUpdater viewUpdater, Database database, string priceApiLicenseKey)
 		{
 			this.display = viewUpdater;
 			this.database = database;
-			if(!string.IsNullOrWhiteSpace(priceAPILicense))
-				this.priceFetcher = new PriceFetcher(priceAPILicense, this, display);
+			this.priceFetcher = new PriceFetcher(priceApiLicenseKey, this, display);
 		}
 
 		public Stock GetStock(string name) => stocks[name];
+
+		public string PriceApiLicenseKey
+		{
+			set => priceFetcher.ApiLicenseKey = value;
+		}
 
 		public void Load(IPortfolioView view)
 		{

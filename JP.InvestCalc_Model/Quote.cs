@@ -46,7 +46,6 @@ namespace JP.InvestCalc
 
 		protected Quote(string code)
 		{
-			Debug.Assert(!string.IsNullOrWhiteSpace(code));
 			Code = code;
 		}
 	}
