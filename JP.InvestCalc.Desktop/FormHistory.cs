@@ -128,7 +128,7 @@ namespace JP.InvestCalc
 				"Are you sure you want to delete ALL the selected records?" :
 				"Are you sure you want to delete the selected record?" ;
 
-			var ans = MessageBox.Show(this, msg, "Please confirm",
+			var ans = MessageBox.Show(this, msg, Config.AppName,
 				MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
 
 			if(ans != DialogResult.Yes) return;

@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
 
 namespace JP.InvestCalc
 {
@@ -17,21 +14,21 @@ namespace JP.InvestCalc
 		private readonly PriceFetcher priceFetcher;
 		private readonly ViewUpdater display;
 
-		internal PortfolioData(ViewUpdater viewUpdater, Database database, string priceApiLicenseKey)
+		internal PortfolioData(ViewUpdater viewUpdater, Database database)
 		{
 			this.display = viewUpdater;
 			this.database = database;
-			this.priceFetcher = new PriceFetcher(priceApiLicenseKey, this, display);
+			this.priceFetcher = new PriceFetcher(this, display);
 		}
 
 		public Stock GetStock(string name) => stocks[name];
-
-		public string PriceApiLicenseKey
+		
+		internal string ApiLicense
 		{
 			set => priceFetcher.ApiLicenseKey = value;
 		}
 
-		public void Load(IPortfolioView view)
+		public void Load(PortfolioView view)
 		{
 			var pricesKnown = (
 				from stockByName in stocks
@@ -61,14 +58,14 @@ namespace JP.InvestCalc
 			FetchPrices(namesToFetch, view);
 		}
 
-		private void FetchPrices(IEnumerable<string> stocksToFetch, IPortfolioView view)
+		private void FetchPrices(IEnumerable<string> stocksToFetch, PortfolioView view)
 		{
 			priceFetcher.TryFetchPrices(database.GetFetchCodes(stocksToFetch), view);
 		}
-		private void FetchPrices(string nameToFetch, IPortfolioView view)
+		private void FetchPrices(string nameToFetch, PortfolioView view)
 			=> FetchPrices(new[] { nameToFetch }, view);
 
-		public void AddShares(IPortfolioView view, string stockName, double shares,
+		public void AddShares(PortfolioView view, string stockName, double shares,
 			double flow, DateTime date, string comment)
 		{
 			bool already = stocks.TryGetValue(stockName, out var stk);

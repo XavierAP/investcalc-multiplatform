@@ -6,15 +6,13 @@ using System.Windows.Forms;
 
 namespace JP.InvestCalc
 {
-	internal partial class FormMain : Form, IPortfolioView
+	internal partial class FormMain : Form, PortfolioView
 	{
 		private readonly ModelGateway Model;
-		private readonly DataBindings ModelDataBindings; // Not from ModelGateway or in .Model assembly in general, because SQLiteBinder is not supported by Microsoft.Data.Sqlite (see branch 'microsoft' of repo 'libcs-sqlite' where JP.SQLite lives), which is the only one that works on mobile; and the .Model dll must be common to desktop and mobile/Xamarin apps.
 
 		internal FormMain(ModelGateway model)
 		{
 			Model = model;
-			ModelDataBindings = new DataBindings(model);
 
 			InitializeComponent();
 			table.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
@@ -35,8 +33,6 @@ namespace JP.InvestCalc
 			table.CellValidating += ValidatingInput;
 			table.SelectionChanged += SelectionChanged;
 			SelectionChanged(null, null);
-
-			Disposed += (s,e) => ModelDataBindings.Dispose();
 		}
 
 		public void AddStock(string name, double shares, double? returnPer1Yearly)
@@ -214,9 +210,10 @@ namespace JP.InvestCalc
 		
 		private void EditStockData(object sender, EventArgs ea)
 		{
-			var data = ModelDataBindings.StockBinding;
+			using var bindings = new DataBindings(Model);
+			var data = bindings.StockBinding;
 			using var dlg = new FormStockData(data,
-				() => ModelDataBindings.Update(data),
+				() => bindings.Update(data),
 				OnSaveApiLicense);
 
 			bool newLicense = false;
@@ -232,7 +229,7 @@ namespace JP.InvestCalc
 			void OnSaveApiLicense(string licenseKey)
 			{
 				newLicense = !string.IsNullOrWhiteSpace(licenseKey);
-				Model.Portfolio.PriceApiLicenseKey = licenseKey;
+				Model.ApiLicenseKey = licenseKey;
 				Properties.Settings.Default.ApiLicense = licenseKey;
 				Properties.Settings.Default.Save();
 			}

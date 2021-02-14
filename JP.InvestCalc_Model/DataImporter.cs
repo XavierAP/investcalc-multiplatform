@@ -10,7 +10,7 @@ namespace JP.InvestCalc
 	{
 		private readonly SQLiteConnector connection;
 
-		public DataImporter(SQLiteConnector connection) => this.connection = connection;
+		internal DataImporter(SQLiteConnector connection) => this.connection = connection;
 
 		public int ImportFlows(string csv, string separator)
 		{

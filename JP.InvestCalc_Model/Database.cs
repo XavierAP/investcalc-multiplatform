@@ -18,7 +18,7 @@ namespace JP.InvestCalc
 
 		public const string QueryStocks = "SELECT * FROM Stocks";
 
-		public Database(string dataFile)
+		internal Database(string dataFile)
 		{
 			FilePath = dataFile;
 			Connection = File.Exists(dataFile) ?

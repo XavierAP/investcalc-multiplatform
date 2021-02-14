@@ -1,4 +1,3 @@
-﻿using System;
 using System.IO;
 
 namespace JP.InvestCalc
@@ -11,7 +10,12 @@ namespace JP.InvestCalc
 
 		internal ViewUpdater Display { get; }
 
-		public ModelGateway(string dataDirectory, string priceAPILicense)
+		public string ApiLicenseKey
+		{
+			set => Portfolio.ApiLicense = value;
+		}
+
+		public ModelGateway(string dataDirectory, string apiLicenseKey)
 		{
 			if(string.IsNullOrWhiteSpace(dataDirectory))
 				dataDirectory = string.Empty;
@@ -21,7 +25,9 @@ namespace JP.InvestCalc
 			Calculator = new Calculator(database);
 			Display = new ViewUpdater(Calculator);
 			Data = new DataFacade(database);
-			Portfolio = new PortfolioData(Display, database, priceAPILicense);
+			Portfolio = new PortfolioData(Display, database);
+
+			ApiLicenseKey = apiLicenseKey;
 		}
 	}
 }

@@ -11,7 +11,7 @@ using System.Data.Common;
 
 namespace JP.InvestCalc
 {
-	internal sealed class PageMain : ContentPage, IPortfolioView
+	internal sealed class PageMain : ContentPage, PortfolioView
 	{
 		private readonly ModelGateway model = new ModelGateway(GetDataFolder(), GetPriceAPILicense());
 

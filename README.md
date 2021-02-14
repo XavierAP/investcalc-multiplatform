@@ -3,7 +3,7 @@ Program to keep track of investments and calculate their returns.
 Desktop version complete, mobile apps in progress.
 Both share same back-end source code (.NET and Xamarin).
 
-![Screenshot](https://i.postimg.cc/mkZFF0qS/demo.png "Example of main window")
+![Screenshot](https://i.postimg.cc/zGWbYDp2/Invest-Calc.png "Example of main window")
 
 ## Features
 * Register orders
@@ -37,3 +37,5 @@ by Newton-Raphson's iterative method.
 
 * [libcs-sqlite](https://github.com/XavierAP/libcs-sqlite)
 is used for SQLite database implementation.
+
+* [libcs-utils](https://github.com/XavierAP/libcs-utils)

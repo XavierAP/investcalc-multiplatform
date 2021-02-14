@@ -11,20 +11,27 @@ namespace JP.InvestCalc
 			Action<string> onSaveApiLicense)
 		{
 			this.onSaveApiLicense = onSaveApiLicense;
+
 			InitializeComponent();
 			InitializeGridView(dataSource, onSaveData);
 			InitializeLicenseInput();
-			btnSearch.Click += (s, e) => MessageBox.Show("Not implemented yet :(");
+
+			btnSearch.Click += (s,e) =>
+			{
+				using(var dlg = new FormSearch(txtLicense.Text))
+					dlg.ShowDialog();
+			};
 		}
 
 		private void InitializeGridView(object dataSource, Action onSaveData)
 		{
 			var table = new SQLiteGridView(dataSource, 1)
 			{
-				AutoSize = true,
 				Dock = DockStyle.Fill,
 				AllowUserToAddRows = false,
 				AllowUserToDeleteRows = false,
+				AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+				RowHeadersVisible = false,
 			};
 			layoutPanel.Controls.Add(table, 0, 1);
 			layoutPanel.SetColumnSpan(table, 2);
@@ -45,6 +52,8 @@ namespace JP.InvestCalc
 
 			Disposed += (s,e) => table.Dispose();
 		}
+
+		#region License key input
 
 		private void InitializeLicenseInput()
 		{
@@ -67,6 +76,13 @@ namespace JP.InvestCalc
 
 		private void StartLicenseInput(object sender, EventArgs ea)
 		{
+			if(IsFirstTimeLicenseInput)
+			{
+				IsFirstTimeLicenseInput = false;
+				if(string.IsNullOrWhiteSpace(txtLicense.Text)) MessageBox.Show(
+					"To get a free license go to https://www.alphavantage.co (not affiliated).",
+					Config.AppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+			}
 			txtLicenseBackup = txtLicense.Text;
 			SwapControlsInTableLayoutPanel(layoutPanel, btnLicense, txtLicense);
 			txtLicense.SelectAll();
@@ -101,6 +117,7 @@ namespace JP.InvestCalc
 
 		TextBox txtLicense;
 		string txtLicenseBackup;
+		static bool IsFirstTimeLicenseInput = true;
 
 		readonly Action<string> onSaveApiLicense;
 
@@ -113,5 +130,7 @@ namespace JP.InvestCalc
 			parent.Controls.Add(substitute, position.Column, position.Row);
 			parent.ResumeLayout();
 		}
+
+		#endregion
 	}
 }

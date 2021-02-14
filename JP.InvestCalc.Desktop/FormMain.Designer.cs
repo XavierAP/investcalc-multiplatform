@@ -157,6 +157,7 @@
 			this.table.Location = new System.Drawing.Point(4, 24);
 			this.table.Margin = new System.Windows.Forms.Padding(4);
 			this.table.Name = "table";
+			this.table.RowHeadersVisible = false;
 			this.table.RowHeadersWidth = 51;
 			this.table.RowTemplate.Height = 24;
 			this.table.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;

@@ -2,7 +2,7 @@
 
 namespace JP.InvestCalc
 {
-	public interface IPortfolioView
+	public interface PortfolioView
 	{
 		void InvokeOnUIThread(Action action);
 		void AddStock(string name, double shares, double? returnPer1Yearly);

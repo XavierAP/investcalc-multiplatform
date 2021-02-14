@@ -14,16 +14,15 @@ namespace JP.InvestCalc
 		private readonly PortfolioData portfolio;
 		private readonly ViewUpdater display;
 
-		public PriceFetcher(string apiLicenseKey, PortfolioData portfolio, ViewUpdater display)
+		internal PriceFetcher(PortfolioData portfolio, ViewUpdater display)
 		{
 			this.portfolio = portfolio;
-			this.ApiLicenseKey = apiLicenseKey;
 			this.display = display;
 		}
 
 		public async void TryFetchPrices(
 			IEnumerable<(string Name, string Code)> stocksToFetch,
-			IPortfolioView view)
+			PortfolioView view)
 		{
 			if(string.IsNullOrWhiteSpace(ApiLicenseKey))
 				return;
@@ -37,11 +36,12 @@ namespace JP.InvestCalc
 
 		private async Task FetchPrices(
 			IEnumerable<(string Name, string Code)> stocksToFetch,
-			IPortfolioView view)
+			PortfolioView view)
 		{
+			var quoter = new StockQuoter(ApiLicenseKey);
 			var fetchJobs = (
 				from s in stocksToFetch
-				select FetchPrice(s)
+				select FetchPrice(s, quoter)
 				).ToList();
 
 			while(fetchJobs.Any())
@@ -51,7 +51,7 @@ namespace JP.InvestCalc
 				if(done.IsFaulted) continue;
 
 				var fetched = done.Result;
-				if(fetched.Error != null) continue;
+				if(fetched.IsFaulted) continue;
 
 				var stk = portfolio.GetStock(fetched.StockName);
 				stk.Price = fetched.Price;
@@ -60,16 +60,20 @@ namespace JP.InvestCalc
 			}
 		}
 
-		private async Task<(string StockName, double Price, Exception Error)>
-		FetchPrice((string Name, string Code) stock)
+		private async Task<(string StockName, double Price, bool IsFaulted)>
+		FetchPrice((string Name, string Code) stock, StockQuoter quoter)
 		{
-			var qt = new QuoteAlphaVantage(stock.Code, ApiLicenseKey);
-			if(qt == null)
-				return (stock.Name, 0, new Exception(
-					$"Invalid fetch code \"{stock.Code}\"."));
-
-			var price = await qt.LoadPrice();
-			return (stock.Name, price, qt.Error);
+			double price = double.NaN;
+			bool isFaulted = false;
+			try
+			{
+				price = await quoter.LoadPrice(stock.Code);
+			}
+			catch
+			{
+				isFaulted = true;
+			}
+			return (stock.Name, price, isFaulted);
 		}
 	}
 }

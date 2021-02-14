@@ -72,7 +72,7 @@ Use separator
 				return;
 			}
 
-			var ans = MessageBox.Show(this, "Do you want to parse and import these data as CSV?", "Please confirm",
+			var ans = MessageBox.Show(this, "Do you want to parse and import these data as CSV?", Config.AppName,
 				MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1);
 
 			if(ans == DialogResult.Cancel)

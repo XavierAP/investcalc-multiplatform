@@ -55,7 +55,7 @@ namespace JP.InvestCalc
 			this.layoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.layoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
 			this.layoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.layoutPanel.Size = new System.Drawing.Size(398, 398);
+			this.layoutPanel.Size = new System.Drawing.Size(382, 353);
 			this.layoutPanel.TabIndex = 0;
 			// 
 			// btnLicense
@@ -65,7 +65,7 @@ namespace JP.InvestCalc
 			this.btnLicense.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.btnLicense.Location = new System.Drawing.Point(3, 3);
 			this.btnLicense.Name = "btnLicense";
-			this.btnLicense.Size = new System.Drawing.Size(193, 30);
+			this.btnLicense.Size = new System.Drawing.Size(185, 30);
 			this.btnLicense.TabIndex = 0;
 			this.btnLicense.Text = "License key...";
 			// 
@@ -74,9 +74,9 @@ namespace JP.InvestCalc
 			this.btnSearch.AutoSize = true;
 			this.btnSearch.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.btnSearch.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.btnSearch.Location = new System.Drawing.Point(202, 3);
+			this.btnSearch.Location = new System.Drawing.Point(194, 3);
 			this.btnSearch.Name = "btnSearch";
-			this.btnSearch.Size = new System.Drawing.Size(193, 30);
+			this.btnSearch.Size = new System.Drawing.Size(185, 30);
 			this.btnSearch.TabIndex = 1;
 			this.btnSearch.Text = "Search fetchCodes...";
 			// 
@@ -86,14 +86,14 @@ namespace JP.InvestCalc
 			this.btnSave.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.btnSave.DialogResult = System.Windows.Forms.DialogResult.OK;
 			this.btnSave.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.btnSave.Location = new System.Drawing.Point(8, 340);
+			this.btnSave.Location = new System.Drawing.Point(8, 295);
 			this.btnSave.Margin = new System.Windows.Forms.Padding(8);
 			this.btnSave.Name = "btnSave";
 			this.btnSave.Padding = new System.Windows.Forms.Padding(20, 10, 20, 10);
-			this.btnSave.Size = new System.Drawing.Size(183, 50);
+			this.btnSave.Size = new System.Drawing.Size(175, 50);
 			this.btnSave.TabIndex = 3;
 			this.btnSave.TabStop = false;
-			this.btnSave.Text = "Save";
+			this.btnSave.Text = "&Save";
 			// 
 			// btnCancel
 			// 
@@ -101,21 +101,20 @@ namespace JP.InvestCalc
 			this.btnCancel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
 			this.btnCancel.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.btnCancel.Location = new System.Drawing.Point(207, 340);
+			this.btnCancel.Location = new System.Drawing.Point(199, 295);
 			this.btnCancel.Margin = new System.Windows.Forms.Padding(8);
 			this.btnCancel.Name = "btnCancel";
 			this.btnCancel.Padding = new System.Windows.Forms.Padding(20, 10, 20, 10);
-			this.btnCancel.Size = new System.Drawing.Size(183, 50);
+			this.btnCancel.Size = new System.Drawing.Size(175, 50);
 			this.btnCancel.TabIndex = 4;
 			this.btnCancel.TabStop = false;
-			this.btnCancel.Text = "Cancel";
+			this.btnCancel.Text = "&Cancel";
 			// 
 			// FormStockData
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.AutoSize = true;
-			this.ClientSize = new System.Drawing.Size(398, 398);
+			this.ClientSize = new System.Drawing.Size(382, 353);
 			this.Controls.Add(this.layoutPanel);
 			this.MinimizeBox = false;
 			this.MinimumSize = new System.Drawing.Size(400, 400);
