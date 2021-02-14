@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -29,6 +30,8 @@ namespace JP.InvestCalc
 
 			mnuHistory.Click += OpsHistory;
 			mnuData.Click += EditStockData;
+			mnuExport.Click += ExportFile;
+			mnuImport.Click += ImportFile;
 
 			table.CellValidating += ValidatingInput;
 			table.SelectionChanged += SelectionChanged;
@@ -235,6 +238,30 @@ namespace JP.InvestCalc
 			}
 		}
 
+		
+		private void ExportFile(object sender, EventArgs ea)
+		{
+			using var dlg = new SaveFileDialog
+			{
+				FileName = Path.GetFileName(Model.Data.FilePath),
+			};
+			SetInitialDirectory(dlg);
+			dlg.TryIfOk(pathName => File.Copy(Model.Data.FilePath, pathName, true));
+		}
+
+		private void ImportFile(object sender, EventArgs ea)
+		{
+			using var dlg = new OpenFileDialog();
+			SetInitialDirectory(dlg);
+			dlg.TryIfOk(pathName =>
+			{
+				File.Copy(pathName, Model.Data.FilePath, true);
+				FillTable();
+			});
+		}
+
+		private static void SetInitialDirectory(FileDialog dlg) =>
+			dlg.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
 		private Dictionary<string, double>
 		GetPortfolio() => (

@@ -29,7 +29,8 @@
 		private void InitializeComponent()
 		{
 			this.components = new System.ComponentModel.Container();
-			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+			System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+			System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
 			this.pnlTab = new System.Windows.Forms.TableLayoutPanel();
 			this.txtReturnSelected = new System.Windows.Forms.TextBox();
 			this.txtReturnAvg = new System.Windows.Forms.TextBox();
@@ -47,14 +48,17 @@
 			this.mnuDividend = new System.Windows.Forms.ToolStripMenuItem();
 			this.mnuCost = new System.Windows.Forms.ToolStripMenuItem();
 			this.mnuHistory = new System.Windows.Forms.ToolStripMenuItem();
+			this.mnuData = new System.Windows.Forms.ToolStripMenuItem();
+			this.mnuExport = new System.Windows.Forms.ToolStripMenuItem();
+			this.mnuImport = new System.Windows.Forms.ToolStripMenuItem();
 			this.txtValueSelected = new System.Windows.Forms.TextBox();
 			this.txtValueTotal = new System.Windows.Forms.TextBox();
 			this.lblDate = new System.Windows.Forms.Label();
 			this.lblValueSelected = new System.Windows.Forms.Label();
 			this.lblValueTotal = new System.Windows.Forms.Label();
 			this.pnl = new System.Windows.Forms.Panel();
-			this.mnuData = new System.Windows.Forms.ToolStripMenuItem();
-			this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+			toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+			toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
 			this.pnlTab.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.table)).BeginInit();
 			this.mnuOperate.SuspendLayout();
@@ -63,8 +67,8 @@
 			// 
 			// toolStripSeparator1
 			// 
-			this.toolStripSeparator1.Name = "toolStripSeparator1";
-			this.toolStripSeparator1.Size = new System.Drawing.Size(156, 6);
+			toolStripSeparator1.Name = "toolStripSeparator1";
+			toolStripSeparator1.Size = new System.Drawing.Size(156, 6);
 			// 
 			// pnlTab
 			// 
@@ -207,12 +211,14 @@
             this.mnuSell,
             this.mnuDividend,
             this.mnuCost,
-            this.toolStripSeparator1,
+            toolStripSeparator1,
             this.mnuHistory,
-            this.toolStripSeparator2,
-            this.mnuData});
+            toolStripSeparator2,
+            this.mnuData,
+            this.mnuExport,
+            this.mnuImport});
 			this.mnuOperate.Name = "mnuOperate";
-			this.mnuOperate.Size = new System.Drawing.Size(160, 184);
+			this.mnuOperate.Size = new System.Drawing.Size(160, 240);
 			// 
 			// mnuBuy
 			// 
@@ -243,6 +249,29 @@
 			this.mnuHistory.Name = "mnuHistory";
 			this.mnuHistory.Size = new System.Drawing.Size(159, 28);
 			this.mnuHistory.Text = "History";
+			// 
+			// toolStripSeparator2
+			// 
+			toolStripSeparator2.Name = "toolStripSeparator2";
+			toolStripSeparator2.Size = new System.Drawing.Size(156, 6);
+			// 
+			// mnuData
+			// 
+			this.mnuData.Name = "mnuData";
+			this.mnuData.Size = new System.Drawing.Size(159, 28);
+			this.mnuData.Text = "Stock data";
+			// 
+			// mnuExport
+			// 
+			this.mnuExport.Name = "mnuExport";
+			this.mnuExport.Size = new System.Drawing.Size(159, 28);
+			this.mnuExport.Text = "Export file";
+			// 
+			// mnuImport
+			// 
+			this.mnuImport.Name = "mnuImport";
+			this.mnuImport.Size = new System.Drawing.Size(159, 28);
+			this.mnuImport.Text = "Import file";
 			// 
 			// txtValueSelected
 			// 
@@ -309,17 +338,6 @@
 			this.pnl.Size = new System.Drawing.Size(582, 453);
 			this.pnl.TabIndex = 0;
 			// 
-			// mnuData
-			// 
-			this.mnuData.Name = "mnuData";
-			this.mnuData.Size = new System.Drawing.Size(159, 28);
-			this.mnuData.Text = "Stock data";
-			// 
-			// toolStripSeparator2
-			// 
-			this.toolStripSeparator2.Name = "toolStripSeparator2";
-			this.toolStripSeparator2.Size = new System.Drawing.Size(156, 6);
-			// 
 			// FormMain
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 20F);
@@ -369,6 +387,8 @@
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
 		private System.Windows.Forms.ToolStripMenuItem mnuData;
+		private System.Windows.Forms.ToolStripMenuItem mnuExport;
+		private System.Windows.Forms.ToolStripMenuItem mnuImport;
 	}
 }
 
