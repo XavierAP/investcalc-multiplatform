@@ -11,15 +11,15 @@ namespace JP.InvestCalc
 			if(string.IsNullOrWhiteSpace(licenseKey)) throw new ArgumentNullException();
 
 			license = licenseKey;
-			retriever = new Retriever<double>();
+			retriever = new Retriever();
 			csvParser = new CsvParser();
 		}
 		
 		/// <exception cref="Exception" />
-		public async Task<double> LoadPrice(string code) => await retriever.Load(GetUrl(code), Parse);
+		public async Task<double> LoadPrice(string code) => Parse(await retriever.Load(GetUrl(code)));
 
 		readonly string license;
-		readonly Retriever<double> retriever;
+		readonly Retriever retriever;
 		readonly CsvParser csvParser;
 
 		private string GetUrl(string code)

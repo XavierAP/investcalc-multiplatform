@@ -6,19 +6,19 @@ namespace JP.InvestCalc
 {
 	public class StockSearcher
 	{
-		readonly Retriever<string[][]> retriever;
+		readonly Retriever retriever;
 		readonly CsvParser csvParser;
 
 		public StockSearcher()
 		{
-			retriever = new Retriever<string[][]>();
+			retriever = new Retriever();
 			csvParser = new CsvParser();
 		}
 		
 		/// <summary>Returns for each row: 0) fetchCode, 1) name in API, 2) currency, 3) region, 4) type.</summary>
 		/// <exception cref="Exception" />
 		public async Task<string[][]> Search(string keywords, string apiLicenseKey) => (
-			await retriever.Load(GetUrl(keywords, apiLicenseKey), Parse)
+			Parse(await retriever.Load(GetUrl(keywords, apiLicenseKey)))
 			).Filter("symbol", "name", "currency", "region", "type");
 
 		private string GetUrl(string keywords, string apiLicenseKey)
