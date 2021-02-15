@@ -64,6 +64,7 @@
 			this.table.Location = new System.Drawing.Point(0, 0);
 			this.table.Margin = new System.Windows.Forms.Padding(4);
 			this.table.Name = "table";
+			this.table.RowHeadersVisible = false;
 			this.table.RowTemplate.Height = 24;
 			this.table.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
 			this.table.Size = new System.Drawing.Size(782, 553);
@@ -107,9 +108,9 @@
 			this.colComment.ReadOnly = true;
 			this.colComment.Width = 159;
 			// 
-			// mnu
+			// mnuCommands
 			// 
-			this.mnuCommands.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.mnuCommands.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
 			this.mnuCommands.ImageScalingSize = new System.Drawing.Size(20, 20);
 			this.mnuCommands.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.mnuDelete,
@@ -142,7 +143,7 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(782, 553);
 			this.Controls.Add(this.table);
-			this.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
 			this.Margin = new System.Windows.Forms.Padding(4);
 			this.MinimizeBox = false;
 			this.Name = "FormHistory";
