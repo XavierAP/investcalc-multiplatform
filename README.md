@@ -18,6 +18,9 @@ Both share same back-end source code (.NET and Xamarin).
 * Retrieve stock prices from the Internet
 (via <https://www.alphavantage.co>
 -- license key needed, freely available).
+For this the "fetchCode" of each stock must be entered into the "stock data".
+An online search function for these codes is also included in the app.
+Prices can also be entered manually.
 
 * Display and manipulate order history.
 Can filter by dates and stocks.
