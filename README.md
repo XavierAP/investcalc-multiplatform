@@ -40,5 +40,10 @@ by Newton-Raphson's iterative method.
 
 * [libcs-sqlite](https://github.com/XavierAP/libcs-sqlite)
 is used for SQLite database implementation.
+Note: the desktop app requires the 'master' branch of this library
+for its extra binding features,
+whereas the Xamarin apps require the 'microsoft' branch
+(will otherwise throw at run-time, at least with the current System.Data.SQLite version).
+Not my fault... :(
 
 * [libcs-utils](https://github.com/XavierAP/libcs-utils)
