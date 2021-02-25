@@ -17,8 +17,8 @@ namespace JP.InvestCalc
 
 		private readonly StackLayout containerLayout = new StackLayout();
 
-		private readonly Dictionary<string, (Label Shares, Entry Price, Label Value, Label Return)> stockIndex
-			= new Dictionary<string, (Label Shares, Entry Price, Label Value, Label Return)>();
+		private readonly Dictionary<string, (string NameKey, Label Shares, Entry Price, Label TotalValue, Label Return)>
+		stockIndex = new Dictionary<string, (string NameKey, Label Shares, Entry Price, Label TotalValue, Label Return)>();
 
 		private readonly static RowDefinition layoutRow = new RowDefinition { Height = GridLength.Auto };
 		private readonly static ColumnDefinitionCollection layoutCols;
@@ -69,7 +69,8 @@ namespace JP.InvestCalc
 		{
 			var stockGrid = new Grid { ColumnDefinitions = layoutCols };
 			containerLayout.Children.Add(stockGrid);
-			(Label Shares, Entry Price, Label Value, Label Return) fields;
+			(string NameKey, Label Shares, Entry Price, Label TotalValue, Label Return) fields;
+			fields.NameKey = name;
 
 			int irow = 0;
 			// Header: stock name and number of shares.
@@ -100,7 +101,7 @@ namespace JP.InvestCalc
 			// Right column, down from top: total value, yearly return.
 			stockGrid.Children.Add(new Label { Text = "Value:", HorizontalTextAlignment = TextAlignment.End },
 				icol, irow);
-			stockGrid.Children.Add(fields.Value = new Label { },
+			stockGrid.Children.Add(fields.TotalValue = new Label { },
 				icol + 1, irow);
 			stockGrid.Children.Add(new Label { Text = "Yearly:", HorizontalTextAlignment = TextAlignment.End },
 				icol, ++irow);
@@ -110,7 +111,7 @@ namespace JP.InvestCalc
 			if(returnPer1Yearly.HasValue)
 				fields.Return.Text = FormatPerCent(returnPer1Yearly);
 
-			fields.Price.TextChanged += Price_Changed;
+			fields.Price.Completed += OnPriceChanged;
 
 			stockIndex.Add(name, fields);
 		}
@@ -122,12 +123,12 @@ namespace JP.InvestCalc
 			if(stk.Price.HasValue)
 			{
 				fields.Price.Text = stk.Price.ToString();
-				fields.Value.Text = FormatMoney(stk.Price * stk.Shares);
+				fields.TotalValue.Text = FormatMoney(stk.Price * stk.Shares);
 			}
 			else
 			{
 				fields.Price.Text =
-				fields.Value.Text = null;
+				fields.TotalValue.Text = null;
 			}
 			if(returnPer1Yearly.HasValue)
 				fields.Return.Text = FormatPerCent(returnPer1Yearly);
@@ -171,15 +172,20 @@ namespace JP.InvestCalc
 				).ToArray();
 		}
 
-		private void Price_Changed(object sender, EventArgs ea)
+		private void OnPriceChanged(object sender, EventArgs ea)
 		{
-			var priceInput = (Entry)sender;
-			var fields = stockIndex.Values.Where(f => priceInput == f.Price).Single();
+			var priceEntry = (Entry)sender;
+			var fields = stockIndex.Values.Where(f => priceEntry == f.Price).First();
 
-			if(double.TryParse(priceInput.Text, out var price))
-				fields.Value.Text = FormatMoney(price * double.Parse(fields.Shares.Text));
+			if(double.TryParse(priceEntry.Text, out var price))
+			{
+				var stk = model.Portfolio.GetStock(fields.NameKey);
+				fields.TotalValue.Text = FormatMoney(price * stk.Shares);
+				fields.Return.Text = FormatPerCent(
+					model.Calculator.CalcReturn(stk.Name, stk.Shares, price));
+			}
 			else
-				fields.Value.Text = null;
+				fields.TotalValue.Text = null;
 		}
 
 		private async void PromptOptions(object sender, EventArgs ea)
