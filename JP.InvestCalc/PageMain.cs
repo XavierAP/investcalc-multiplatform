@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Xamarin.Essentials;
 using Xamarin.Forms;
 using System.Data.Common;
+using System.Diagnostics;
 
 namespace JP.InvestCalc
 {
@@ -15,13 +16,36 @@ namespace JP.InvestCalc
 	{
 		private readonly ModelGateway model = new ModelGateway(GetDataFolder(), GetPriceAPILicense());
 
-		private readonly StackLayout containerLayout;
+		readonly StackLayout mainLayout = new StackLayout();
+		readonly StackLayout stocksLayout = new StackLayout();
+
+		readonly Grid buttonsLayoutOnPortrait = new Grid
+		{
+			ColumnDefinitions = layoutCols,
+			HorizontalOptions = layoutFillOption,
+			VerticalOptions   = layoutEndOption,
+		};
+		readonly Grid buttonsLayoutOnLandscape = new Grid
+		{
+			HorizontalOptions = layoutEndOption,
+			VerticalOptions   = layoutFillOption,
+		};
+
+		readonly Button
+			btnBuy      = new Button { Text = "Buy" },
+			btnSell     = new Button { Text = "Sell" },
+			btnDividend = new Button { Text = "Div." },
+			btnCost     = new Button { Text = "Cost" },
+			btnHistory  = new Button { Text = "History" },
+			btnOptions  = new Button { Text = "Options" };
 
 		private readonly Dictionary<string, (Label Shares, Entry Price, Label TotalValue, Label Return)>
 		stockIndex = new Dictionary<string, (Label Shares, Entry Price, Label TotalValue, Label Return)>();
 
-		private readonly static RowDefinition layoutRow = new RowDefinition { Height = GridLength.Auto };
-		private readonly static ColumnDefinitionCollection layoutCols;
+		readonly static RowDefinition layoutRow = new RowDefinition { Height = GridLength.Auto };
+		readonly static ColumnDefinitionCollection layoutCols;
+		readonly static LayoutOptions layoutFillOption = new LayoutOptions(LayoutAlignment.Fill, true);
+		readonly static LayoutOptions layoutEndOption  = new LayoutOptions(LayoutAlignment.End, false);
 
 		const string Pad = " ";
 
@@ -35,22 +59,66 @@ namespace JP.InvestCalc
 
 		public PageMain()
 		{
-			var pageStack = new StackLayout();
-			this.Content = pageStack;
-			pageStack.BackgroundColor = Color.AliceBlue;
+			this.Content = mainLayout;
+			mainLayout.BackgroundColor = Color.AliceBlue;
 
-			var scroll = new ScrollView();
-			pageStack.Children.Add(scroll);
+			var scroll = new ScrollView
+			{
+				HorizontalOptions = layoutFillOption,
+				VerticalOptions   = layoutFillOption,
+			};
+			mainLayout.Children.Add(scroll);
 			scroll.Padding = 10;
-			scroll.Content = containerLayout = new StackLayout();
+			scroll.Content = stocksLayout;
+			
+			SetButtonsLayoutForPortrait();
+			SetButtonsLayoutForLandscape();
+			SizeChanged += OnSizeChanged;
+
+			btnHistory.Clicked += OpenHistory;
+			btnOptions.Clicked += PromptOptions;
 
 			RefreshPortfolio();
 		}
 
+		private void OnSizeChanged(object sender, EventArgs ea)
+		{
+			if(Width > Height)
+				PageOrientation = Orientation.Landscape;
+			else
+				PageOrientation = Orientation.Portrait;
+		}
+
+		private Orientation PageOrientation
+		{
+			set
+			{
+				if(value == _PageOrientation)
+					return;
+
+				ResetButtonsLayout();
+
+				if(value == Orientation.Landscape)
+				{
+					LayButtonsForLandscape();
+					mainLayout.Orientation = StackOrientation.Horizontal;
+				}
+				else
+				{
+					LayButtonsForPortrait();
+					mainLayout.Orientation = StackOrientation.Vertical;
+				}
+
+				_PageOrientation = value;
+			}
+		}
+		private Orientation _PageOrientation = Orientation.NotSet;
+
+
 		private void RefreshPortfolio()
 		{
 			stockIndex.Clear();
-			containerLayout.Children.Clear();
+			stocksLayout.Children.Clear();
 			try
 			{
 				model.Portfolio.Load(this);
@@ -60,7 +128,6 @@ namespace JP.InvestCalc
 				File.Delete(model.Data.FilePath);
 				Environment.Exit(1);
 			}
-			AddButtons();
 		}
 
 		public void InvokeOnUIThread(Action action) => MainThread.BeginInvokeOnMainThread(action);
@@ -68,7 +135,7 @@ namespace JP.InvestCalc
 		public void AddStock(string name, double shares, double? returnPer1Yearly)
 		{
 			var stockGrid = new Grid { ColumnDefinitions = layoutCols };
-			containerLayout.Children.Add(stockGrid);
+			stocksLayout.Children.Add(stockGrid);
 			(Label Shares, Entry Price, Label TotalValue, Label Return) fields;
 
 			int irow = 0;
@@ -135,37 +202,74 @@ namespace JP.InvestCalc
 				fields.Return.Text = null;
 		}
 
-		private void AddButtons()
+		
+		private void SetButtonsLayoutForPortrait()
 		{
-			var commandGrid = new Grid { ColumnDefinitions = layoutCols };
-			containerLayout.Children.Add(commandGrid);
-
-			int icol, irow;
-			Button btn;
-
-			commandGrid.RowDefinitions.Add(layoutRow);
-			commandGrid.Children.Add(new Button { Text = "Buy" },
-				icol = 0, irow = 0);
-			commandGrid.Children.Add(new Button { Text = "Sell" },
-				++icol, irow);
-			commandGrid.Children.Add(new Button { Text = "Div." },
-				++icol, irow);
-			commandGrid.Children.Add(new Button { Text = "Cost" },
-				++icol, irow);
-
-			commandGrid.RowDefinitions.Add(layoutRow);
-
-			commandGrid.Children.Add(btn = new Button { Text = "History" },
-				0, icol = 2, ++irow, irow + 1);
-			btn.Clicked += FooHistory;
-
-			commandGrid.Children.Add(btn = new Button { Text = "Options" },
-				icol, 4, irow, irow + 1);
-			btn.Clicked += PromptOptions;
+			for(int i = 0; i < 2; ++i)
+				buttonsLayoutOnPortrait.RowDefinitions.Add(layoutRow);
 		}
 
-		private void FooHistory(object sender, EventArgs ea)
+		private void SetButtonsLayoutForLandscape()
 		{
+			buttonsLayoutOnLandscape.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+			var layoutRow = new RowDefinition { Height = GridLength.Star };
+			for(int i = 0; i < 6; ++i)
+				buttonsLayoutOnLandscape.RowDefinitions.Add(layoutRow);
+		}
+
+		private void ResetButtonsLayout()
+		{
+			buttonsLayoutOnPortrait.Children.Clear();
+			buttonsLayoutOnLandscape.Children.Clear();
+			mainLayout.Children.Remove(buttonsLayoutOnPortrait);
+			mainLayout.Children.Remove(buttonsLayoutOnLandscape);
+		}
+
+		private void LayButtonsForPortrait()
+		{
+			mainLayout.Children.Add(buttonsLayoutOnPortrait);
+
+			int icol, irow;
+			buttonsLayoutOnPortrait.Children.Add(btnBuy,
+				icol = 0, irow = 0);
+			buttonsLayoutOnPortrait.Children.Add(btnSell,
+				++icol, irow);
+			buttonsLayoutOnPortrait.Children.Add(btnDividend,
+				++icol, irow);
+			buttonsLayoutOnPortrait.Children.Add(btnCost,
+				++icol, irow);
+			buttonsLayoutOnPortrait.Children.Add(btnHistory,
+				0, icol = 2, ++irow, irow + 1);
+			buttonsLayoutOnPortrait.Children.Add(btnOptions,
+				icol, 4, irow, irow + 1);
+		}
+
+		private void LayButtonsForLandscape()
+		{
+			mainLayout.Children.Add(buttonsLayoutOnLandscape);
+			
+			const int icol = 0;
+			int irow;
+			buttonsLayoutOnLandscape.Children.Add(btnBuy,
+				icol, irow = 0);
+			buttonsLayoutOnLandscape.Children.Add(btnSell,
+				icol, ++irow);
+			buttonsLayoutOnLandscape.Children.Add(btnDividend,
+				icol, ++irow);
+			buttonsLayoutOnLandscape.Children.Add(btnCost,
+				icol, ++irow);
+			buttonsLayoutOnLandscape.Children.Add(btnHistory,
+				icol, ++irow);
+			buttonsLayoutOnLandscape.Children.Add(btnOptions,
+				icol, ++irow);
+
+			Debug.Assert(irow + 1 == buttonsLayoutOnLandscape.RowDefinitions.Count);
+		}
+
+
+		private void OpenHistory(object sender, EventArgs ea)
+		{
+			//TODO
 			var flows = model.Data.GetFlowEditor().GetFlowDetailsOrdered(new[] { "ASML" },
 				new DateTime(2000, 1, 1), DateTime.Now
 				).ToArray();
