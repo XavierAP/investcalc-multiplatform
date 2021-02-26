@@ -15,10 +15,10 @@ namespace JP.InvestCalc
 	{
 		private readonly ModelGateway model = new ModelGateway(GetDataFolder(), GetPriceAPILicense());
 
-		private readonly StackLayout containerLayout = new StackLayout();
+		private readonly StackLayout containerLayout;
 
-		private readonly Dictionary<string, (string NameKey, Label Shares, Entry Price, Label TotalValue, Label Return)>
-		stockIndex = new Dictionary<string, (string NameKey, Label Shares, Entry Price, Label TotalValue, Label Return)>();
+		private readonly Dictionary<string, (Label Shares, Entry Price, Label TotalValue, Label Return)>
+		stockIndex = new Dictionary<string, (Label Shares, Entry Price, Label TotalValue, Label Return)>();
 
 		private readonly static RowDefinition layoutRow = new RowDefinition { Height = GridLength.Auto };
 		private readonly static ColumnDefinitionCollection layoutCols;
@@ -42,7 +42,7 @@ namespace JP.InvestCalc
 			var scroll = new ScrollView();
 			pageStack.Children.Add(scroll);
 			scroll.Padding = 10;
-			scroll.Content = containerLayout;
+			scroll.Content = containerLayout = new StackLayout();
 
 			RefreshPortfolio();
 		}
@@ -69,8 +69,7 @@ namespace JP.InvestCalc
 		{
 			var stockGrid = new Grid { ColumnDefinitions = layoutCols };
 			containerLayout.Children.Add(stockGrid);
-			(string NameKey, Label Shares, Entry Price, Label TotalValue, Label Return) fields;
-			fields.NameKey = name;
+			(Label Shares, Entry Price, Label TotalValue, Label Return) fields;
 
 			int irow = 0;
 			// Header: stock name and number of shares.
@@ -111,7 +110,7 @@ namespace JP.InvestCalc
 			if(returnPer1Yearly.HasValue)
 				fields.Return.Text = FormatPerCent(returnPer1Yearly);
 
-			fields.Price.Completed += OnPriceChanged;
+			fields.Price.Completed += (s,e) => OnPriceChanged(name);
 
 			stockIndex.Add(name, fields);
 		}
@@ -156,7 +155,7 @@ namespace JP.InvestCalc
 
 			commandGrid.RowDefinitions.Add(layoutRow);
 
-			commandGrid.Children.Add(btn = new Button { Text = "History..." },
+			commandGrid.Children.Add(btn = new Button { Text = "History" },
 				0, icol = 2, ++irow, irow + 1);
 			btn.Clicked += FooHistory;
 
@@ -172,14 +171,13 @@ namespace JP.InvestCalc
 				).ToArray();
 		}
 
-		private void OnPriceChanged(object sender, EventArgs ea)
+		private void OnPriceChanged(string stockName)
 		{
-			var priceEntry = (Entry)sender;
-			var fields = stockIndex.Values.Where(f => priceEntry == f.Price).First();
+			var fields = stockIndex[stockName];
 
-			if(double.TryParse(priceEntry.Text, out var price))
+			if(double.TryParse(fields.Price.Text, out var price))
 			{
-				var stk = model.Portfolio.GetStock(fields.NameKey);
+				var stk = model.Portfolio.GetStock(stockName);
 				fields.TotalValue.Text = FormatMoney(price * stk.Shares);
 				fields.Return.Text = FormatPerCent(
 					model.Calculator.CalcReturn(stk.Name, stk.Shares, price));
