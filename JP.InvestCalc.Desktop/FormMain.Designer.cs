@@ -384,8 +384,6 @@
 		private System.Windows.Forms.DataGridViewTextBoxColumn colValue;
 		private System.Windows.Forms.DataGridViewTextBoxColumn colReturn;
 		private System.Windows.Forms.ToolStripMenuItem mnuHistory;
-		private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-		private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
 		private System.Windows.Forms.ToolStripMenuItem mnuData;
 		private System.Windows.Forms.ToolStripMenuItem mnuExport;
 		private System.Windows.Forms.ToolStripMenuItem mnuImport;
