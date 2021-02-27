@@ -24,7 +24,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InvestCalc_desktop", "JP.In
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JP.SQLite.WinForms", "..\libs_NET\JP.SQLite\JP.SQLite.WinForms\JP.SQLite.WinForms.csproj", "{BA052623-60E0-4FB5-841B-560BBDADB5D0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JP.Utils", "..\libs_NET\JP.Utils\JP.Utils.csproj", "{5467E89F-6D58-4DAA-A34C-2E66FE27A362}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JP.Utils", "..\libs_NET\JP.Utils\JP.Utils.csproj", "{5467E89F-6D58-4DAA-A34C-2E66FE27A362}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -55,6 +55,7 @@ Global
 		{7050079E-F9AE-444F-9931-98ADB2761DA6}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
 		{7050079E-F9AE-444F-9931-98ADB2761DA6}.Release|iPhoneSimulator.Deploy.0 = Release|Any CPU
 		{49B58F8D-DE2A-40F9-B12E-714F4D6D1632}.Debug|Any CPU.ActiveCfg = Debug|iPhoneSimulator
+		{49B58F8D-DE2A-40F9-B12E-714F4D6D1632}.Debug|Any CPU.Build.0 = Debug|iPhoneSimulator
 		{49B58F8D-DE2A-40F9-B12E-714F4D6D1632}.Debug|Any CPU.Deploy.0 = Debug|iPhoneSimulator
 		{49B58F8D-DE2A-40F9-B12E-714F4D6D1632}.Debug|iPhone.ActiveCfg = Debug|iPhone
 		{49B58F8D-DE2A-40F9-B12E-714F4D6D1632}.Debug|iPhone.Build.0 = Debug|iPhone

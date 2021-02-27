@@ -12,6 +12,7 @@ namespace JP.InvestCalc
 
 		public string ApiLicenseKey
 		{
+			get => Portfolio.ApiLicense;
 			set => Portfolio.ApiLicense = value;
 		}
 

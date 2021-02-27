@@ -25,6 +25,7 @@ namespace JP.InvestCalc
 		
 		internal string ApiLicense
 		{
+			get => priceFetcher.ApiLicenseKey;
 			set => priceFetcher.ApiLicenseKey = value;
 		}
 

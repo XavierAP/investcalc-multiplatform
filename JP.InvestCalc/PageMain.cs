@@ -75,7 +75,6 @@ namespace JP.InvestCalc
 			SetButtonsLayoutForLandscape();
 			SizeChanged += OnSizeChanged;
 
-			btnHistory.Clicked += OpenHistory;
 			btnOptions.Clicked += PromptOptions;
 
 			RefreshPortfolio();
@@ -267,14 +266,6 @@ namespace JP.InvestCalc
 		}
 
 
-		private void OpenHistory(object sender, EventArgs ea)
-		{
-			//TODO
-			var flows = model.Data.GetFlowEditor().GetFlowDetailsOrdered(new[] { "ASML" },
-				new DateTime(2000, 1, 1), DateTime.Now
-				).ToArray();
-		}
-
 		private void OnPriceChanged(string stockName)
 		{
 			var fields = stockIndex[stockName];
@@ -295,7 +286,7 @@ namespace JP.InvestCalc
 			var option = await DisplayActionSheet("Options", "Cancel", null,
 				"Export data file",
 				"Import data file",
-				"Price lookup symbols",
+				"Stock data",
 				"Price lookup license");
 			switch(option)
 			{
@@ -330,7 +321,9 @@ namespace JP.InvestCalc
 
 		private async Task PromptLicense()
 		{
-			string license = await DisplayPromptAsync("API license", "Enter your key from AlphaVantage.co:");
+			string license = await DisplayPromptAsync("API license", "Enter your key from AlphaVantage.co:",
+				initialValue: model.ApiLicenseKey);
+
 			if(license == null) return;
 
 			File.WriteAllText(GetAPILicenseFileName(), license);
