@@ -1,9 +1,7 @@
 ﻿using JP.Utils;
-using Plugin.FilePicker;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
 using Xamarin.Forms;
@@ -307,9 +305,9 @@ namespace JP.InvestCalc
 
 		private async Task ImportDataFile()
 		{
-			var file = await CrossFilePicker.Current.PickFile();
+			var file = await FilePicker.PickAsync();
 			if(file == null) return;
-			using(var stream = file.GetStream())
+			using(var stream = await file.OpenReadAsync())
 			{
 				var err = await Files.TryCopy(stream, model.Data.FilePath);
 				if(err == null)
