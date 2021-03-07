@@ -43,9 +43,9 @@ namespace JP.InvestCalc
 			colFlow.DefaultCellStyle.Format =
 			colPrice.DefaultCellStyle.Format = "C2";
 
-			var rowData = model.GetFlowDetailsOrdered(portfolio, dateFrom, dateTo).ToArray();
-			rowsOrdered = new DataGridViewRow[rowData.Length];
-			for(int idata = 0; idata < rowData.Length; ++idata)
+			var rowData = model.GetFlowDetailsOrdered(portfolio, dateFrom, dateTo);
+			rowsOrdered = new DataGridViewRow[rowData.Count];
+			for(int idata = 0; idata < rowData.Count; ++idata)
 			{
 				var r = rowData[idata];
 				var igui =

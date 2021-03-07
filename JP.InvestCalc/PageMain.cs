@@ -1,12 +1,12 @@
 ﻿using JP.Utils;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
 using Xamarin.Forms;
-using System.Data.Common;
-using System.Diagnostics;
 
 namespace JP.InvestCalc
 {
@@ -284,7 +284,6 @@ namespace JP.InvestCalc
 			var option = await DisplayActionSheet("Options", "Cancel", null,
 				"Export data file",
 				"Import data file",
-				"Stock data",
 				"Price lookup license");
 			switch(option)
 			{

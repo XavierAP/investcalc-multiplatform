@@ -11,7 +11,7 @@ namespace JP.InvestCalc
 
 		public bool IsDataChanged => database.IsPortfolioChanged;
 
-		public IEnumerable<(long Id, DateTime Date, string StockName, double Shares, double Flow, double PriceAvg, string Comment)>
+		public List<(long Id, DateTime Date, string StockName, double Shares, double Flow, double PriceAvg, string Comment)>
 		GetFlowDetailsOrdered(string[] stockNames, DateTime dateFrom, DateTime dateTo)
 			=> database.GetFlowDetailsOrdered(stockNames, dateFrom, dateTo);
 

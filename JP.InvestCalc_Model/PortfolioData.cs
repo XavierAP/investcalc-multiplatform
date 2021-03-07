@@ -41,9 +41,12 @@ namespace JP.InvestCalc
 			var namesToFetch = new List<string>(stocks.Count - pricesKnown.Count);
 
 			stocks.Clear();
-			foreach(var (name, shares) in database.GetPortfolio())
+			var data = database.GetPortfolio();
+			for(int i = 0; i < data.Count; i++)
 			{
+				var (name, shares) = data[i];
 				Debug.Assert(shares >= 0, "Inconsistent database");
+
 				var stk = new Stock(name, shares);
 				stocks.Add(name, stk);
 				display.AddStockToView(stk, view);

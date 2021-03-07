@@ -41,39 +41,43 @@ namespace JP.InvestCalc
 			return n;
 		}
 
-		public IEnumerable<(string StockName, double TotalShares)>
+		public List<(string StockName, double TotalShares)>
 		GetPortfolio()
 		{
-			using(var table = Connection.Select(
+			var ans = new List<(string StockName, double TotalShares)>();
+			using(var query = Connection.Select(
 @"SELECT Stocks.name, total(Flows.shares) as shares
 from Stocks left join Flows
 on Flows.stock = Stocks.id
 group by Stocks.id
 order by name"))
 			{
-				foreach(DataRow record in table.Rows)
-					yield return ( (string)record[0], (double)record[1] );
+				while(query.Read())
+					ans.Add((query.GetString(), query.GetDouble()));
 			}
 			IsPortfolioChanged = false;
+			return ans;
 		}
 
 
 		/// <summary>Returns defined (excluding NULL) fetch codes.</summary>
 		/// <param name="stockNames">Limited to these stocks.
 		/// If null, for all stocks.</param>
-		public IEnumerable<(string Name, string Code)>
+		public List<(string Name, string Code)>
 		GetFetchCodes(IEnumerable<string> stockNames)
 		{
-			using(var table = Connection.Select(
+			var ans = new List<(string Name, string Code)>();
+			using(var query = Connection.Select(
 $@"SELECT name, fetchCodes
 from Stocks
 where {(stockNames==null ? null :
 	$"name in ('{string.Join("', '", stockNames)}') and ")}
 fetchCodes is not NULL"))
 			{
-				foreach(DataRow record in table.Rows)
-					yield return ( (string)record[0], (string)record[1] );
+				while(query.Read())
+					ans.Add((query.GetString(), query.GetString()));
 			}
+			return ans;
 		}
 
 
@@ -102,7 +106,7 @@ $@"INSERT into Flows values (
 		}
 
 
-		public IEnumerable<(double Cash, DateTime Day)>
+		public List<(double Cash, DateTime Day)>
 		GetFlows(params string[] stockNames)
 		{
 			var sql = new StringBuilder(
@@ -114,14 +118,18 @@ from Flows, Stocks ON Flows.stock = Stocks.id
 					from name in stockNames
 					select $"name = '{name}'"));
 
-			using(var table = Connection.Select(sql.ToString()))
-				return from DataRow record in table.Rows select (
-					(double)record[0],
-					new DateTime((long)record[1], DateTimeKind.Utc) );
+			var ans = new List<(double Cash, DateTime Day)>();
+			using(var query = Connection.Select(sql.ToString()))
+				while(query.Read())
+					ans.Add((
+						query.GetDouble() ,
+						new DateTime(query.GetInt64(), DateTimeKind.Utc) ));
+
+			return ans;
 		}
 
 
-		public IEnumerable<(long Id, DateTime Date, string StockName, double Shares, double Flow, double PriceAvg, string Comment)>
+		public List<(long Id, DateTime Date, string StockName, double Shares, double Flow, double PriceAvg, string Comment)>
 		GetFlowDetailsOrdered(string[] stockNames, DateTime dateFrom, DateTime dateTo)
 		{
 			dateFrom = dateFrom.Date;
@@ -143,21 +151,21 @@ from Flows, Stocks ON Flows.stock = Stocks.id
 
 			sql.Append("order by utcDate, shares DESC"); // TL;DR why order by shares DESC: corner case of several operations, with the same stock, in the same day. Chronological order may be lost because dates are rounded down to days; and it would create an absurd history, if the user deleted manually (see DeleteFlows, FormHistory.DoDelete and FormHistory.Table_CellMouseDown) a flow buying shares, so that later flows selling put the total owned into negative.
 
-			using(var table = Connection.Select(sql.ToString()))
-			{
-				foreach(DataRow record in table.Rows)
+			var ans = new List<(long Id, DateTime Date, string StockName, double Shares, double Flow, double PriceAvg, string Comment)>();
+			using(var query = Connection.Select(sql.ToString()))
+				while(query.Read())
 				{
-					var dbId = (long)record[0];
-					var date = new DateTime((long)record[1], DateTimeKind.Utc).ToLocalTime();
-					var stockName = (string)record[2];
-					var shares = (double)record[3];
-					var flow = (double)record[4];
+					var dbId = query.GetInt64();
+					var date = new DateTime(query.GetInt64(), DateTimeKind.Utc).ToLocalTime();
+					var stockName = query.GetString();
+					var shares = query.GetDouble();
+					var flow = query.GetDouble();
 					var priceAvg = Math.Round(-flow / shares, 2);
-					string comment = record[5] == DBNull.Value ? null : (string)record[5];
+					string comment = query.IsNullNext() ? null : query.GetString();
 					
-					yield return (dbId, date, stockName, shares, flow, priceAvg, comment);
+					ans.Add((dbId, date, stockName, shares, flow, priceAvg, comment));
 				}
-			}
+			return ans;
 		}
 
 

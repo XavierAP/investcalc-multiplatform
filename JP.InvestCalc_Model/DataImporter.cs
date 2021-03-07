@@ -86,11 +86,8 @@ where name == '{stockName}'
 and utcDate <= {stockRecords.Value[0].Date.Ticks}
 group by Stocks.id"))
 				{
-					if(query.Rows.Count > 0)
-					{
-						Debug.Assert(1 == query.Rows.Count);
-						sharesOwned = (double)query.Rows[0][0];
-					}
+					if(query.Read())
+						sharesOwned = query.GetDouble();
 					else
 						sharesOwned = 0;
 				}
