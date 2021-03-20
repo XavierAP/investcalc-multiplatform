@@ -294,8 +294,7 @@ namespace JP.InvestCalc
 
 				case "Edit stock name":
 					model.Data.SetStockName(stockName,
-						await DisplayPromptAsync(stockName,
-							"Enter a new name",
+						await DisplayPromptAsync(stockName, "Enter a new name",
 							initialValue: stockName));
 					RefreshPortfolio();
 					break;
