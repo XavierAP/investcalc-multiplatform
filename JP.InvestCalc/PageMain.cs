@@ -30,22 +30,18 @@ namespace JP.InvestCalc
 		};
 
 		readonly Button
-			btnBuy      = new Button { Text = "Buy" },
-			btnSell     = new Button { Text = "Sell" },
-			btnDividend = new Button { Text = "Div." },
-			btnCost     = new Button { Text = "Cost" },
+			btnBuy      = new Button(),
 			btnHistory  = new Button { Text = "History" },
 			btnOptions  = new Button { Text = "Options" };
 
 		private readonly Dictionary<string, (Label Shares, Entry Price, Label TotalValue, Label Return)>
 		stockIndex = new Dictionary<string, (Label Shares, Entry Price, Label TotalValue, Label Return)>();
-
-		readonly static RowDefinition layoutRow = new RowDefinition { Height = GridLength.Auto };
+		
+		readonly static RowDefinition layoutRowHeader = new RowDefinition { Height = GridLength.Auto };
+		readonly static RowDefinition layoutRowOther = new RowDefinition { Height = GridLength.Auto };
 		readonly static ColumnDefinitionCollection layoutCols;
 		readonly static LayoutOptions layoutFillOption = new LayoutOptions(LayoutAlignment.Fill, true);
 		readonly static LayoutOptions layoutEndOption  = new LayoutOptions(LayoutAlignment.End, false);
-
-		const string Pad = " ";
 
 		static PageMain()
 		{
@@ -134,27 +130,35 @@ namespace JP.InvestCalc
 			var stockGrid = new Grid { ColumnDefinitions = layoutCols };
 			stocksLayout.Children.Add(stockGrid);
 			(Label Shares, Entry Price, Label TotalValue, Label Return) fields;
+			Button btn;
 
 			int irow = 0;
 			// Header: stock name and number of shares.
-			stockGrid.RowDefinitions.Add(layoutRow);
-			stockGrid.Children.Add(new Label
+			stockGrid.RowDefinitions.Add(layoutRowHeader);
+			stockGrid.Children.Add(btn = new Button
 			{
-				Text = Pad + name,
-				FontAttributes = FontAttributes.Bold
+				Text = name,
+				FontAttributes = FontAttributes.Bold,
+				BackgroundColor = Color.LightBlue,
+				BorderColor = Color.Blue,
+				BorderWidth = 1,
+				CornerRadius = 10,
 			}, 0, 3, irow, irow + 1);
 			stockGrid.Children.Add(fields.Shares = new Label
 			{
-				Text = shares.ToString() + Pad,
-				HorizontalTextAlignment = TextAlignment.End
+				Text = shares.ToString(),
+				HorizontalTextAlignment = TextAlignment.Center,
+				VerticalTextAlignment = TextAlignment.Center,
+				FontAttributes = FontAttributes.Bold,
+				BackgroundColor = Color.LightBlue,
 			}, 3, 4, irow, irow + 1);
-			foreach(var it in stockGrid.Children)
-				it.BackgroundColor = Color.LightBlue;
+
+			btn.Clicked += (s, e) => PromptStockActions(name);
 
 			++irow;
 			// Left column, double height: price.
-			stockGrid.RowDefinitions.Add(layoutRow);
-			stockGrid.RowDefinitions.Add(layoutRow);
+			stockGrid.RowDefinitions.Add(layoutRowOther);
+			stockGrid.RowDefinitions.Add(layoutRowOther);
 			stockGrid.Children.Add(new Label { Text = "Price:", HorizontalTextAlignment = TextAlignment.End },
 				0, 1, irow, irow + 2);
 			stockGrid.Children.Add(fields.Price = new Entry { Keyboard = Keyboard.Numeric },
@@ -182,7 +186,7 @@ namespace JP.InvestCalc
 		public void SetStockFigures(Stock stk, double? returnPer1Yearly)
 		{
 			var fields = stockIndex[stk.Name];
-			fields.Shares.Text = stk.Shares.ToString() + Pad;
+			fields.Shares.Text = stk.Shares.ToString();
 			if(stk.Price.HasValue)
 			{
 				fields.Price.Text = stk.Price.ToString();
@@ -202,15 +206,14 @@ namespace JP.InvestCalc
 		
 		private void SetButtonsLayoutForPortrait()
 		{
-			for(int i = 0; i < 2; ++i)
-				buttonsLayoutOnPortrait.RowDefinitions.Add(layoutRow);
+			buttonsLayoutOnPortrait.RowDefinitions.Add(layoutRowOther);
 		}
 
 		private void SetButtonsLayoutForLandscape()
 		{
 			buttonsLayoutOnLandscape.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 			var layoutRow = new RowDefinition { Height = GridLength.Star };
-			for(int i = 0; i < 6; ++i)
+			for(int i = 0; i < 3; ++i)
 				buttonsLayoutOnLandscape.RowDefinitions.Add(layoutRow);
 		}
 
@@ -224,43 +227,36 @@ namespace JP.InvestCalc
 
 		private void LayButtonsForPortrait()
 		{
-			mainLayout.Children.Add(buttonsLayoutOnPortrait);
+			btnBuy.Text = "Buy new";
 
-			int icol, irow;
+			const int irow = 0;
+			int icol;
 			buttonsLayoutOnPortrait.Children.Add(btnBuy,
-				icol = 0, irow = 0);
-			buttonsLayoutOnPortrait.Children.Add(btnSell,
-				++icol, irow);
-			buttonsLayoutOnPortrait.Children.Add(btnDividend,
-				++icol, irow);
-			buttonsLayoutOnPortrait.Children.Add(btnCost,
-				++icol, irow);
+				0, icol = 2, irow, irow+1);
 			buttonsLayoutOnPortrait.Children.Add(btnHistory,
-				0, icol = 2, ++irow, irow + 1);
+				icol, irow);
 			buttonsLayoutOnPortrait.Children.Add(btnOptions,
-				icol, 4, irow, irow + 1);
+				++icol, irow);
+
+			mainLayout.Children.Add(buttonsLayoutOnPortrait);
 		}
 
 		private void LayButtonsForLandscape()
 		{
-			mainLayout.Children.Add(buttonsLayoutOnLandscape);
-			
+			btnBuy.Text = "Buy\nnew";
+
 			const int icol = 0;
 			int irow;
 			buttonsLayoutOnLandscape.Children.Add(btnBuy,
 				icol, irow = 0);
-			buttonsLayoutOnLandscape.Children.Add(btnSell,
-				icol, ++irow);
-			buttonsLayoutOnLandscape.Children.Add(btnDividend,
-				icol, ++irow);
-			buttonsLayoutOnLandscape.Children.Add(btnCost,
-				icol, ++irow);
 			buttonsLayoutOnLandscape.Children.Add(btnHistory,
 				icol, ++irow);
 			buttonsLayoutOnLandscape.Children.Add(btnOptions,
 				icol, ++irow);
 
 			Debug.Assert(irow + 1 == buttonsLayoutOnLandscape.RowDefinitions.Count);
+
+			mainLayout.Children.Add(buttonsLayoutOnLandscape);
 		}
 
 
@@ -278,6 +274,23 @@ namespace JP.InvestCalc
 			else
 				fields.TotalValue.Text = null;
 		}
+		
+		private async void PromptStockActions(string stockName)
+		{
+			var option = await DisplayActionSheet(stockName, "Cancel", null,
+				Operation.Buy.Text,
+				Operation.Sell.Text,
+				Operation.Dividend.Text,
+				Operation.Cost.Text,
+				"Enter fetch code",
+				"Edit stock name");
+			switch(option)
+			{
+				default:
+					return;
+			}
+		}
+
 
 		private async void PromptOptions(object sender, EventArgs ea)
 		{
@@ -326,6 +339,7 @@ namespace JP.InvestCalc
 			File.WriteAllText(GetAPILicenseFileName(), license);
 			Environment.Exit(0);
 		}
+
 
 		private static string GetPriceAPILicense()
 		{
