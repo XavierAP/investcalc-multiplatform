@@ -79,6 +79,11 @@ fetchCodes is not NULL"))
 			}
 			return ans;
 		}
+		
+		public void SetFetchCode(string stockName, string code)
+		{
+			Connection.Write($"UPDATE Stocks SET fetchCodes = '{code}' WHERE name = '{stockName}'");
+		}
 
 
 		/// <summary>Records a new operation into the database.</summary>
@@ -182,7 +187,8 @@ from Flows, Stocks ON Flows.stock = Stocks.id
 
 create table Stocks ( -- Portfolio of stocks, shares, bonds, metals, etc.
 	id integer primary key,
-	name text unique collate nocase not null -- Human-friendly name; unique index.
+	name text unique collate nocase not null, -- Human-friendly name; unique index.
+	fetchCodes text
 );
 create table Flows ( -- Record of purchases, sales, dividends, holding costst, etc.
 	utcDate integer not null,
@@ -196,9 +202,6 @@ create index idxFlow2Stock
 on Flows(stock);
 create index idxFlowDate
 on Flows(utcDate);
-
-alter table Stocks add
-	fetchCodes text;
 ";
 	}
 }

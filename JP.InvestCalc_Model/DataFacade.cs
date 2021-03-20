@@ -1,4 +1,6 @@
-﻿namespace JP.InvestCalc
+﻿using System;
+
+namespace JP.InvestCalc
 {
 	public class DataFacade
 	{
@@ -10,5 +12,7 @@
 
 		public string FilePath => Database.FilePath;
 		public string QueryStocks => Database.QueryStocks;
+
+		public void SetFetchCode(string stockName, string code) => Database.SetFetchCode(stockName, code);
 	}
 }

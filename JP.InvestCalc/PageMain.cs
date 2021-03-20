@@ -286,6 +286,12 @@ namespace JP.InvestCalc
 				"Edit stock name");
 			switch(option)
 			{
+				case "Enter fetch code":
+					model.Data.SetFetchCode(stockName, await DisplayPromptAsync(stockName, "Enter fetch code"));
+					RefreshPortfolio();
+					break;
+					
+				case "Cancel":
 				default:
 					return;
 			}
