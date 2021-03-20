@@ -25,6 +25,7 @@ namespace JP.InvestCalc
 				new SQLiteConnector(dataFile, true) :
 				CreateEmptyDatabase(dataFile) ;
 		}
+
 		private SQLiteConnector CreateEmptyDatabase(string dataFile)
 		{
 			Directory.CreateDirectory(Path.GetDirectoryName(dataFile));
@@ -59,6 +60,16 @@ order by name"))
 			return ans;
 		}
 
+		
+		public void SetStockName(string oldName, string newName)
+		{
+			Connection.Write($"UPDATE Stocks SET name = '{newName}' WHERE name = '{oldName}'");
+		}
+
+		public void SetFetchCode(string stockName, string code)
+		{
+			Connection.Write($"UPDATE Stocks SET fetchCodes = '{code}' WHERE name = '{stockName}'");
+		}
 
 		/// <summary>Returns defined (excluding NULL) fetch codes.</summary>
 		/// <param name="stockNames">Limited to these stocks.
@@ -80,11 +91,6 @@ fetchCodes is not NULL"))
 			return ans;
 		}
 		
-		public void SetFetchCode(string stockName, string code)
-		{
-			Connection.Write($"UPDATE Stocks SET fetchCodes = '{code}' WHERE name = '{stockName}'");
-		}
-
 
 		/// <summary>Records a new operation into the database.</summary>
 		/// <param name="newStock">Whether this stock was traded before.</param>

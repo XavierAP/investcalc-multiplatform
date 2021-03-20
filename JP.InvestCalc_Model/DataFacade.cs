@@ -14,5 +14,7 @@ namespace JP.InvestCalc
 		public string QueryStocks => Database.QueryStocks;
 
 		public void SetFetchCode(string stockName, string code) => Database.SetFetchCode(stockName, code);
+
+		public void SetStockName(string oldName, string newName) => Database.SetStockName(oldName, newName);
 	}
 }

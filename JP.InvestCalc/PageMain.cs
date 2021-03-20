@@ -287,7 +287,16 @@ namespace JP.InvestCalc
 			switch(option)
 			{
 				case "Enter fetch code":
-					model.Data.SetFetchCode(stockName, await DisplayPromptAsync(stockName, "Enter fetch code"));
+					model.Data.SetFetchCode(stockName,
+						await DisplayPromptAsync(stockName, "Enter fetch code"));
+					RefreshPortfolio();
+					break;
+
+				case "Edit stock name":
+					model.Data.SetStockName(stockName,
+						await DisplayPromptAsync(stockName,
+							"Enter a new name",
+							initialValue: stockName));
 					RefreshPortfolio();
 					break;
 					
