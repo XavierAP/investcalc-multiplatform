@@ -7,10 +7,13 @@ dotnet_diagnostic.CA1305.severity = silent
 dotnet_diagnostic.CA1303.severity = silent
 
 # CA1810: Initialize reference type static fields inline
-dotnet_diagnostic.CA1810.severity = none
+dotnet_diagnostic.CA1810.severity = silent
 
 # CA2007: Do not directly await a Task
 dotnet_diagnostic.CA2007.severity = silent
+
+# IDE0071: Simplify interpolation
+dotnet_diagnostic.IDE0071.severity = silent
 
 csharp_style_deconstructed_variable_declaration = false:suggestion
 csharp_prefer_simple_using_statement = false:suggestion

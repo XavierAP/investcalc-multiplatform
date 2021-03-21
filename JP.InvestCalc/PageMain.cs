@@ -37,11 +37,13 @@ namespace JP.InvestCalc
 		private readonly Dictionary<string, (Label Shares, Entry Price, Label TotalValue, Label Return)>
 		stockIndex = new Dictionary<string, (Label Shares, Entry Price, Label TotalValue, Label Return)>();
 		
-		readonly static RowDefinition layoutRowHeader = new RowDefinition { Height = GridLength.Auto };
+		readonly static RowDefinition layoutRowHeaderHalf = new RowDefinition { Height = GridLength.Auto };
 		readonly static RowDefinition layoutRowOther = new RowDefinition { Height = GridLength.Auto };
 		readonly static ColumnDefinitionCollection layoutCols;
 		readonly static LayoutOptions layoutFillOption = new LayoutOptions(LayoutAlignment.Fill, true);
 		readonly static LayoutOptions layoutEndOption  = new LayoutOptions(LayoutAlignment.End, false);
+		 
+		const string Pad = " ";
 
 		static PageMain()
 		{
@@ -132,9 +134,11 @@ namespace JP.InvestCalc
 			(Label Shares, Entry Price, Label TotalValue, Label Return) fields;
 			Button btn;
 
-			int irow = 0;
-			// Header: stock name and number of shares.
-			stockGrid.RowDefinitions.Add(layoutRowHeader);
+			int irow = 0,
+				icol = 0;
+			// Header: stock name (left 3 cols by 2 rows) and value and number of shares (right col by 1 row each).
+			stockGrid.RowDefinitions.Add(layoutRowHeaderHalf);
+			stockGrid.RowDefinitions.Add(layoutRowHeaderHalf);
 			stockGrid.Children.Add(btn = new Button
 			{
 				Text = name,
@@ -143,37 +147,35 @@ namespace JP.InvestCalc
 				BorderColor = Color.Blue,
 				BorderWidth = 1,
 				CornerRadius = 10,
-			}, 0, 3, irow, irow + 1);
+			}, 0, icol = 3, irow, irow + 2);
+			stockGrid.Children.Add(fields.TotalValue = new Label
+			{
+				Text = FormatValueOnUnknownPrice(shares),
+				HorizontalTextAlignment = TextAlignment.End,
+				BackgroundColor = Color.LightBlue,
+			}, icol, irow);
 			stockGrid.Children.Add(fields.Shares = new Label
 			{
-				Text = shares.ToString(),
-				HorizontalTextAlignment = TextAlignment.Center,
-				VerticalTextAlignment = TextAlignment.Center,
-				FontAttributes = FontAttributes.Bold,
+				Text = FormatShares(shares),
+				HorizontalTextAlignment = TextAlignment.End,
 				BackgroundColor = Color.LightBlue,
-			}, 3, 4, irow, irow + 1);
+			}, icol, ++icol, ++irow, ++irow);
 
 			btn.Clicked += (s, e) => PromptStockActions(name);
 
-			++irow;
-			// Left column, double height: price.
-			stockGrid.RowDefinitions.Add(layoutRowOther);
+			icol = 0;
+			// Left column: price.
 			stockGrid.RowDefinitions.Add(layoutRowOther);
 			stockGrid.Children.Add(new Label { Text = "Price:", HorizontalTextAlignment = TextAlignment.End },
-				0, 1, irow, irow + 2);
+				icol, ++icol, irow, irow + 1);
 			stockGrid.Children.Add(fields.Price = new Entry { Keyboard = Keyboard.Numeric },
-				1, 2, irow, irow + 2);
+				icol, ++icol, irow, irow + 1);
 
-			int icol = 2;
-			// Right column, down from top: total value, yearly return.
-			stockGrid.Children.Add(new Label { Text = "Value:", HorizontalTextAlignment = TextAlignment.End },
-				icol, irow);
-			stockGrid.Children.Add(fields.TotalValue = new Label { },
-				icol + 1, irow);
+			// Right column: yearly return.
 			stockGrid.Children.Add(new Label { Text = "Yearly:", HorizontalTextAlignment = TextAlignment.End },
-				icol, ++irow);
-			stockGrid.Children.Add(fields.Return = new Label { },
-				icol + 1, irow);
+				icol, irow);
+			stockGrid.Children.Add(fields.Return = new Label(),
+				++icol, irow);
 
 			if(returnPer1Yearly.HasValue)
 				fields.Return.Text = FormatPerCent(returnPer1Yearly);
@@ -186,7 +188,7 @@ namespace JP.InvestCalc
 		public void SetStockFigures(Stock stk, double? returnPer1Yearly)
 		{
 			var fields = stockIndex[stk.Name];
-			fields.Shares.Text = stk.Shares.ToString();
+			fields.Shares.Text = FormatShares(stk.Shares);
 			if(stk.Price.HasValue)
 			{
 				fields.Price.Text = stk.Price.ToString();
@@ -194,8 +196,8 @@ namespace JP.InvestCalc
 			}
 			else
 			{
-				fields.Price.Text =
-				fields.TotalValue.Text = null;
+				fields.Price.Text = null;
+				fields.TotalValue.Text = FormatValueOnUnknownPrice(stk.Shares);
 			}
 			if(returnPer1Yearly.HasValue)
 				fields.Return.Text = FormatPerCent(returnPer1Yearly);
@@ -264,17 +266,17 @@ namespace JP.InvestCalc
 		{
 			var fields = stockIndex[stockName];
 
+			var stk = model.Portfolio.GetStock(stockName);
 			if(double.TryParse(fields.Price.Text, out var price))
 			{
-				var stk = model.Portfolio.GetStock(stockName);
 				fields.TotalValue.Text = FormatMoney(price * stk.Shares);
 				fields.Return.Text = FormatPerCent(
 					model.Calculator.CalcReturn(stk.Name, stk.Shares, price));
 			}
 			else
-				fields.TotalValue.Text = null;
+				fields.TotalValue.Text = FormatValueOnUnknownPrice(stk.Shares);
 		}
-		
+
 		private async void PromptStockActions(string stockName)
 		{
 			var option = await DisplayActionSheet(stockName, "Cancel", null,
@@ -372,9 +374,11 @@ namespace JP.InvestCalc
 
 		private static string GetDataFolder() => Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 
-		private static string FormatMoney(double? value) => value.Value.ToString("N2");
-
-		private static string FormatPerCent(double? per1) => per1.Value.ToString("P" + Config.PrecisionPerCent);
+		private static string FormatMoney(double? value) => value.Value.ToString("N2") + Pad;
+		private static string FormatPerCent(double? per1) => per1.Value.ToString("P" + Config.PrecisionPerCent.ToString());
+		private static string FormatShares(double shares) => $"({shares.ToString()}){Pad}";
+		
+		private static string FormatValueOnUnknownPrice(double shares) => shares == 0 ? FormatMoney(0) : null;
 
 		private Task DisplayError(Exception err) => DisplayAlert("ERROR! " + err.GetType().Name, err.Message, "OK");
 	}
