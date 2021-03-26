@@ -47,8 +47,6 @@ namespace JP.InvestCalc
 		readonly static ColumnDefinitionCollection layoutCols;
 		readonly static LayoutOptions layoutFillOption = new LayoutOptions(LayoutAlignment.Fill, true);
 		readonly static LayoutOptions layoutEndOption  = new LayoutOptions(LayoutAlignment.End, false);
-		 
-		const string Pad = " ";
 
 		static PageMain()
 		{
@@ -61,7 +59,7 @@ namespace JP.InvestCalc
 		public PageMain()
 		{
 			this.Content = mainLayout;
-			mainLayout.BackgroundColor = Color.AliceBlue;
+			mainLayout.BackgroundColor = Format.BackgroundColor;
 
 			mainLayout.Children.Add(CreateAverageReturnView());
 			mainLayout.Children.Add(CreateStocksView());
@@ -71,6 +69,9 @@ namespace JP.InvestCalc
 			SizeChanged += OnSizeChanged;
 
 			btnOptions.Clicked += PromptOptions;
+			btnHistory.Clicked += async (s,e) => await Navigation.PushModalAsync(new PageHistory(
+				model.Data.GetFlowEditor(),
+				GetAllStockNames()));
 
 			RefreshPortfolio();
 		}
@@ -167,22 +168,22 @@ namespace JP.InvestCalc
 			{
 				Text = name,
 				FontAttributes = FontAttributes.Bold,
-				BackgroundColor = Color.LightBlue,
-				BorderColor = Color.Blue,
+				BackgroundColor = Format.FillColor,
+				BorderColor = Format.LineColor,
 				BorderWidth = 1,
 				CornerRadius = 10,
 			}, 0, icol = 3, irow, irow + 2);
 			stockGrid.Children.Add(fields.TotalValue = new Label
 			{
-				Text = FormatValueOnUnknownPrice(shares),
+				Text = Format.ValueOnUnknownPrice(shares),
 				HorizontalTextAlignment = TextAlignment.End,
-				BackgroundColor = Color.LightBlue,
+				BackgroundColor = Format.FillColor,
 			}, icol, irow);
 			stockGrid.Children.Add(fields.Shares = new Label
 			{
-				Text = FormatShares(shares),
+				Text = shares.FormatShares(),
 				HorizontalTextAlignment = TextAlignment.End,
-				BackgroundColor = Color.LightBlue,
+				BackgroundColor = Format.FillColor,
 			}, icol, ++icol, ++irow, ++irow);
 
 			btn.Clicked += (s, e) => PromptStockActions(name);
@@ -202,7 +203,7 @@ namespace JP.InvestCalc
 				++icol, irow);
 
 			if(returnPer1Yearly.HasValue)
-				fields.Return.Text = FormatPerCent(returnPer1Yearly);
+				fields.Return.Text = returnPer1Yearly.FormatPerCent();
 
 			fields.Price.Completed += (s,e) => OnPriceChanged(name);
 
@@ -212,19 +213,19 @@ namespace JP.InvestCalc
 		public void SetStockFigures(Stock stk, double? returnPer1Yearly)
 		{
 			var fields = stockIndex[stk.Name];
-			fields.Shares.Text = FormatShares(stk.Shares);
+			fields.Shares.Text = stk.Shares.FormatShares();
 			if(stk.Price.HasValue)
 			{
 				fields.Price.Text = stk.Price.ToString();
-				fields.TotalValue.Text = FormatMoney(stk.Price * stk.Shares);
+				fields.TotalValue.Text = (stk.Price * stk.Shares).FormatMoney();
 			}
 			else
 			{
 				fields.Price.Text = null;
-				fields.TotalValue.Text = FormatValueOnUnknownPrice(stk.Shares);
+				fields.TotalValue.Text = Format.ValueOnUnknownPrice(stk.Shares);
 			}
 			if(returnPer1Yearly.HasValue)
-				fields.Return.Text = FormatPerCent(returnPer1Yearly);
+				fields.Return.Text = returnPer1Yearly.FormatPerCent();
 			else
 				fields.Return.Text = null;
 
@@ -295,12 +296,11 @@ namespace JP.InvestCalc
 			var stk = model.Portfolio.GetStock(stockName);
 			if(double.TryParse(fields.Price.Text, out var price))
 			{
-				fields.TotalValue.Text = FormatMoney(price * stk.Shares);
-				fields.Return.Text = FormatPerCent(
-					model.Calculator.CalcReturn(stk.Name, stk.Shares, price));
+				fields.TotalValue.Text = (price * stk.Shares).FormatMoney();
+				fields.Return.Text = model.Calculator.CalcReturn(stk.Name, stk.Shares, price).FormatPerCent();
 			}
 			else
-				fields.TotalValue.Text = FormatValueOnUnknownPrice(stk.Shares);
+				fields.TotalValue.Text = Format.ValueOnUnknownPrice(stk.Shares);
 			
 			TryCalcReturnAvg();
 		}
@@ -319,8 +319,7 @@ namespace JP.InvestCalc
 				total += double.Parse(fields.TotalValue.Text);
 			}
 			averageReturn.Tag.Text = "Average return:";
-			averageReturn.Value.Text = FormatPerCent(
-				model.Calculator.CalcReturnAvg(GetAllStockNames(), total));
+			averageReturn.Value.Text = model.Calculator.CalcReturnAvg(GetAllStockNames(), total).FormatPerCent();
 		}
 
 		private async void PromptStockActions(string stockName)
@@ -335,6 +334,10 @@ namespace JP.InvestCalc
 				"Edit stock name");
 			switch(option)
 			{
+				case "History":
+					await Navigation.PushModalAsync(new PageHistory(model.Data.GetFlowEditor(), stockName));
+					break;
+
 				case "Enter fetch code":
 					string code = await DisplayPromptAsync(stockName, "Enter fetch code");
 					if(null == code)
@@ -422,11 +425,6 @@ namespace JP.InvestCalc
 		private static string GetDataFolder() => Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 
 		private string[] GetAllStockNames() => stockIndex.Keys.ToArray();
-
-		private static string FormatMoney(double? value) => value.Value.ToString("N2") + Pad;
-		private static string FormatPerCent(double? per1) => per1.Value.ToString("P" + Config.PrecisionPerCent.ToString());
-		private static string FormatShares(double shares) => $"({shares.ToString()}){Pad}";
-		private static string FormatValueOnUnknownPrice(double shares) => shares == 0 ? FormatMoney(0) : null;
 
 		private Task DisplayError(Exception err) => DisplayAlert("ERROR! " + err.GetType().Name, err.Message, "OK");
 	}
