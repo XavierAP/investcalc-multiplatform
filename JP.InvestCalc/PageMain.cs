@@ -320,9 +320,7 @@ namespace JP.InvestCalc
 			}
 			averageReturn.Tag.Text = "Average return:";
 			averageReturn.Value.Text = FormatPerCent(
-				model.Calculator.CalcReturnAvg(
-					stockIndex.Keys.ToArray(),
-					total));
+				model.Calculator.CalcReturnAvg(GetAllStockNames(), total));
 		}
 
 		private async void PromptStockActions(string stockName)
@@ -422,6 +420,8 @@ namespace JP.InvestCalc
 		private static string GetAPILicenseFileName() => Path.Combine(GetDataFolder(), "api-license.txt");
 
 		private static string GetDataFolder() => Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+
+		private string[] GetAllStockNames() => stockIndex.Keys.ToArray();
 
 		private static string FormatMoney(double? value) => value.Value.ToString("N2") + Pad;
 		private static string FormatPerCent(double? per1) => per1.Value.ToString("P" + Config.PrecisionPerCent.ToString());
