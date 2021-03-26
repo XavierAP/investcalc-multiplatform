@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
 using Xamarin.Forms;
@@ -16,6 +17,10 @@ namespace JP.InvestCalc
 
 		readonly StackLayout mainLayout = new StackLayout();
 		readonly StackLayout stocksLayout = new StackLayout();
+
+		readonly (Label Tag, Label Value) averageReturn = (
+			new Label { HorizontalTextAlignment = TextAlignment.End },
+			new Label { HorizontalTextAlignment = TextAlignment.Start });
 
 		readonly Grid buttonsLayoutOnPortrait = new Grid
 		{
@@ -58,14 +63,8 @@ namespace JP.InvestCalc
 			this.Content = mainLayout;
 			mainLayout.BackgroundColor = Color.AliceBlue;
 
-			var scroll = new ScrollView
-			{
-				HorizontalOptions = layoutFillOption,
-				VerticalOptions   = layoutFillOption,
-			};
-			mainLayout.Children.Add(scroll);
-			scroll.Padding = 10;
-			scroll.Content = stocksLayout;
+			mainLayout.Children.Add(CreateAverageReturnView());
+			mainLayout.Children.Add(CreateStocksView());
 			
 			SetButtonsLayoutForPortrait();
 			SetButtonsLayoutForLandscape();
@@ -74,6 +73,30 @@ namespace JP.InvestCalc
 			btnOptions.Clicked += PromptOptions;
 
 			RefreshPortfolio();
+		}
+
+		private View CreateStocksView() => new ScrollView
+		{
+			Content = stocksLayout,
+			HorizontalOptions = layoutFillOption,
+			VerticalOptions   = layoutFillOption,
+			Padding = 10,
+		};
+
+		private View CreateAverageReturnView()
+		{
+			var view = new Grid { ColumnDefinitions = layoutCols };
+			view.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+			const int row = 0;
+			int col = 0;
+
+			view.Children.Add(averageReturn.Tag,
+				col, col+=2, row, row+1);
+
+			view.Children.Add(averageReturn.Value,
+				col, layoutCols.Count, row, row+1);
+
+			return view;
 		}
 
 		private void OnSizeChanged(object sender, EventArgs ea)
@@ -123,6 +146,7 @@ namespace JP.InvestCalc
 				File.Delete(model.Data.FilePath);
 				Environment.Exit(1);
 			}
+			TryCalcReturnAvg();
 		}
 
 		public void InvokeOnUIThread(Action action) => MainThread.BeginInvokeOnMainThread(action);
@@ -203,6 +227,8 @@ namespace JP.InvestCalc
 				fields.Return.Text = FormatPerCent(returnPer1Yearly);
 			else
 				fields.Return.Text = null;
+
+			TryCalcReturnAvg();
 		}
 
 		
@@ -275,6 +301,28 @@ namespace JP.InvestCalc
 			}
 			else
 				fields.TotalValue.Text = FormatValueOnUnknownPrice(stk.Shares);
+			
+			TryCalcReturnAvg();
+		}
+
+		private void TryCalcReturnAvg()
+		{
+			double total = 0;
+			foreach(var fields in stockIndex.Values)
+			{
+				if(fields.TotalValue.Text == null)
+				{
+					averageReturn.Tag.Text =
+					averageReturn.Value.Text = null;
+					return;
+				}
+				total += double.Parse(fields.TotalValue.Text);
+			}
+			averageReturn.Tag.Text = "Average return:";
+			averageReturn.Value.Text = FormatPerCent(
+				model.Calculator.CalcReturnAvg(
+					stockIndex.Keys.ToArray(),
+					total));
 		}
 
 		private async void PromptStockActions(string stockName)
@@ -284,6 +332,7 @@ namespace JP.InvestCalc
 				Operation.Sell.Text,
 				Operation.Dividend.Text,
 				Operation.Cost.Text,
+				"History",
 				"Enter fetch code",
 				"Edit stock name");
 			switch(option)
@@ -292,8 +341,7 @@ namespace JP.InvestCalc
 					string code = await DisplayPromptAsync(stockName, "Enter fetch code");
 					if(null == code)
 						break;
-					model.Data.SetFetchCode(stockName,
-						code);
+					model.Data.SetFetchCode(stockName, code);
 					RefreshPortfolio();
 					break;
 
@@ -377,7 +425,6 @@ namespace JP.InvestCalc
 		private static string FormatMoney(double? value) => value.Value.ToString("N2") + Pad;
 		private static string FormatPerCent(double? per1) => per1.Value.ToString("P" + Config.PrecisionPerCent.ToString());
 		private static string FormatShares(double shares) => $"({shares.ToString()}){Pad}";
-		
 		private static string FormatValueOnUnknownPrice(double shares) => shares == 0 ? FormatMoney(0) : null;
 
 		private Task DisplayError(Exception err) => DisplayAlert("ERROR! " + err.GetType().Name, err.Message, "OK");
