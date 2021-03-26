@@ -364,6 +364,7 @@ namespace JP.InvestCalc
 		private async void PromptOptions(object sender, EventArgs ea)
 		{
 			var option = await DisplayActionSheet("Options", "Cancel", null,
+				"Search fetch codes",
 				"Export data file",
 				"Import data file",
 				"Price lookup license");
