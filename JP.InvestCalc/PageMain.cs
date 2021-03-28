@@ -234,7 +234,7 @@ namespace JP.InvestCalc
 			// Landscape:
 			buttonsLayoutOnLandscape.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 			var layoutRow = new RowDefinition { Height = GridLength.Star };
-			for(int i = 0; i < 3; ++i)
+			for(int i = 0; i < 6; ++i)
 				buttonsLayoutOnLandscape.RowDefinitions.Add(layoutRow);
 		}
 
@@ -275,8 +275,6 @@ namespace JP.InvestCalc
 				icol, ++irow);
 			buttonsLayoutOnLandscape.Children.Add(btnOptions,
 				icol, ++irow);
-
-			Debug.Assert(irow + 1 == buttonsLayoutOnLandscape.RowDefinitions.Count);
 
 			flipLayout.Children.Add(buttonsLayoutOnLandscape);
 			flipLayout.Orientation = StackOrientation.Horizontal;
