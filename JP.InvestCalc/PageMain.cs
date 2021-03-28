@@ -15,7 +15,7 @@ namespace JP.InvestCalc
 	{
 		private readonly ModelGateway model = new ModelGateway(GetDataFolder(), GetPriceAPILicense());
 
-		readonly StackLayout mainLayout = new StackLayout();
+		readonly StackLayout flipLayout = new StackLayout();
 		readonly StackLayout stocksLayout = new StackLayout();
 
 		readonly (Label Tag, Label Value) averageReturn = (
@@ -58,14 +58,15 @@ namespace JP.InvestCalc
 
 		public PageMain()
 		{
-			this.Content = mainLayout;
-			mainLayout.BackgroundColor = Format.BackgroundColor;
+			this.Content = flipLayout;
+			flipLayout.BackgroundColor = Format.BackgroundColor;
 
-			mainLayout.Children.Add(CreateAverageReturnView());
-			mainLayout.Children.Add(CreateStocksView());
+			var verticalLayout = new StackLayout { HorizontalOptions = layoutFillOption };
+			verticalLayout.Children.Add(CreateAverageReturnView());
+			verticalLayout.Children.Add(CreateStocksView());
+			flipLayout.Children.Add(verticalLayout);
 			
-			SetButtonsLayoutForPortrait();
-			SetButtonsLayoutForLandscape();
+			PrepareLayouts();
 			SizeChanged += OnSizeChanged;
 
 			btnOptions.Clicked += PromptOptions;
@@ -112,21 +113,13 @@ namespace JP.InvestCalc
 		{
 			set
 			{
-				if(value == _PageOrientation)
-					return;
+				if(value == _PageOrientation) return;
 
-				ResetButtonsLayout();
-
+				ResetLayout();
 				if(value == Orientation.Landscape)
-				{
-					LayButtonsForLandscape();
-					mainLayout.Orientation = StackOrientation.Horizontal;
-				}
+					SetLayoutLandscape();
 				else
-				{
-					LayButtonsForPortrait();
-					mainLayout.Orientation = StackOrientation.Vertical;
-				}
+					SetLayoutPortrait();
 
 				_PageOrientation = value;
 			}
@@ -233,28 +226,27 @@ namespace JP.InvestCalc
 		}
 
 		
-		private void SetButtonsLayoutForPortrait()
+		private void PrepareLayouts()
 		{
+			// Portrait:
 			buttonsLayoutOnPortrait.RowDefinitions.Add(layoutRowOther);
-		}
 
-		private void SetButtonsLayoutForLandscape()
-		{
+			// Landscape:
 			buttonsLayoutOnLandscape.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 			var layoutRow = new RowDefinition { Height = GridLength.Star };
 			for(int i = 0; i < 3; ++i)
 				buttonsLayoutOnLandscape.RowDefinitions.Add(layoutRow);
 		}
 
-		private void ResetButtonsLayout()
+		private void ResetLayout()
 		{
 			buttonsLayoutOnPortrait.Children.Clear();
 			buttonsLayoutOnLandscape.Children.Clear();
-			mainLayout.Children.Remove(buttonsLayoutOnPortrait);
-			mainLayout.Children.Remove(buttonsLayoutOnLandscape);
+			flipLayout.Children.Remove(buttonsLayoutOnPortrait);
+			flipLayout.Children.Remove(buttonsLayoutOnLandscape);
 		}
 
-		private void LayButtonsForPortrait()
+		private void SetLayoutPortrait()
 		{
 			btnBuy.Text = "Buy new";
 
@@ -267,10 +259,11 @@ namespace JP.InvestCalc
 			buttonsLayoutOnPortrait.Children.Add(btnOptions,
 				++icol, irow);
 
-			mainLayout.Children.Add(buttonsLayoutOnPortrait);
+			flipLayout.Children.Add(buttonsLayoutOnPortrait);
+			flipLayout.Orientation = StackOrientation.Vertical;
 		}
 
-		private void LayButtonsForLandscape()
+		private void SetLayoutLandscape()
 		{
 			btnBuy.Text = "Buy\nnew";
 
@@ -285,7 +278,8 @@ namespace JP.InvestCalc
 
 			Debug.Assert(irow + 1 == buttonsLayoutOnLandscape.RowDefinitions.Count);
 
-			mainLayout.Children.Add(buttonsLayoutOnLandscape);
+			flipLayout.Children.Add(buttonsLayoutOnLandscape);
+			flipLayout.Orientation = StackOrientation.Horizontal;
 		}
 
 
