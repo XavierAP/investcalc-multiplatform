@@ -106,7 +106,7 @@ fetchCodes is not NULL"))
 
 			if(newStock) sql.Add($"INSERT into Stocks(name) values('{stockName}')");
 
-			sql.Add(
+			if(shares != 0 && money != 0) sql.Add(
 $@"INSERT into Flows values (
 {day.ToUniversalTime().Ticks},
 (select id from Stocks where name = '{stockName}'),

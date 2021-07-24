@@ -14,6 +14,8 @@ namespace JP.InvestCalc
 		private readonly Operation opCurrent;
 		private readonly IReadOnlyDictionary<string, double> portfolio;
 
+		private bool OnlyAddingStockToPortfolioNotBuyingAnyShares = false;
+
 		public string StockName   => txtStock.Text;
 		public double Shares  => (double)(opCurrent.SharesMinus ? -numShares.Value : numShares.Value);
 		public double Total   => (double)(opCurrent.MoneyMinus  ? -numTotal.Value  : numTotal.Value );
@@ -54,7 +56,7 @@ namespace JP.InvestCalc
 		private void ConfirmClose(object sender, FormClosingEventArgs ea)
 		{
 			if(DialogResult != DialogResult.OK) return; // Cancel: just go on closing
-			
+
 			txtStock.Text = txtStock.Text.Trim();
 
 			if(HasError())
@@ -62,20 +64,29 @@ namespace JP.InvestCalc
 				ea.Cancel = true;
 				return;
 			}
-
 			if(portfolio.ContainsKey(txtStock.Text))
 			{
 				var max = (decimal)(double)portfolio[txtStock.Text];
 				if(opCurrent.SharesMinus && numShares.Value > max)
 				{
-					MessageBox.Show(this, "Cannot sell more shares than you own.", Config.AppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+					MessageBox.Show("Cannot sell more shares than you own.", Config.AppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
 					numShares.Value = max;
 					ea.Cancel = true;
 					return;
 				}
 			}
+			if(PromptConfirmation() != DialogResult.Yes)
+				ea.Cancel = true;
+		}
 
-			// Compose summary (confirmation) message:
+		private DialogResult PromptConfirmation()
+		{
+			const string caption = "Please confirm";
+			if(OnlyAddingStockToPortfolioNotBuyingAnyShares)
+			{
+				return MessageBox.Show("'Buying' 0 shares will add the stock to the portfolio with no position (so that its price can be followed). As there is no actual operation to register, any comment entered will be discarded.",
+					caption, MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
+			}
 			var msg = new StringBuilder(opCurrent.Text);
 			Debug.Assert(opCurrent.SharesChange || numShares.Value == 0);
 			if(opCurrent.SharesChange) msg.Append($" {numShares.Value} of");
@@ -84,11 +95,8 @@ namespace JP.InvestCalc
 			msg.Append("for ").AppendLine(numTotal.Value.ToString("C"));
 			msg.Append($"on {pickDate.Value.ToLongDateString()}?");
 
-			var ans = MessageBox.Show(this, msg.ToString(), "Please confirm",
+			return MessageBox.Show(msg.ToString(), caption,
 				MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
-
-			if(ans != DialogResult.Yes)
-				ea.Cancel = true;
 		}
 
 		/// <summary>Returns false in case of user input error; otherwise shows an explanatory error popup, and returns true.</summary>
@@ -96,19 +104,24 @@ namespace JP.InvestCalc
 		{
 			if(string.IsNullOrEmpty(txtStock.Text))
 			{
-				MessageBox.Show(this, $"You must select{(txtStock.Enabled ? " or enter" : null)} a stock name.", Config.AppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+				MessageBox.Show($"You must select{(txtStock.Enabled ? " or enter" : null)} a stock name.", Config.AppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
 				listStocks.Focus();
 				return true;
 			}
 			if(opCurrent.SharesChange && numShares.Value == 0)
 			{
-				MessageBox.Show(this, "You must enter an amount of shares.", Config.AppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+				if(opCurrent == Operation.Buy)
+				{
+					OnlyAddingStockToPortfolioNotBuyingAnyShares = true;
+					return false;
+				}
+				MessageBox.Show("You must enter an amount of shares.", Config.AppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
 				numShares.Focus();
 				return true;
 			}
 			if(!opCurrent.SharesChange && numTotal.Value == 0)
 			{
-				MessageBox.Show(this, "You must enter a money amount.", Config.AppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+				MessageBox.Show("You must enter a money amount.", Config.AppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
 				numTotal.Focus();
 				return true;
 			}
