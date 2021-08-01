@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,17 +21,8 @@ namespace JP.InvestCalc
 			new Label { HorizontalTextAlignment = TextAlignment.End },
 			new Label { HorizontalTextAlignment = TextAlignment.Start });
 
-		readonly Grid buttonsLayoutOnPortrait = new Grid
-		{
-			ColumnDefinitions = layoutCols,
-			HorizontalOptions = layoutFillOption,
-			VerticalOptions   = layoutEndOption,
-		};
-		readonly Grid buttonsLayoutOnLandscape = new Grid
-		{
-			HorizontalOptions = layoutEndOption,
-			VerticalOptions   = layoutFillOption,
-		};
+		readonly Grid buttonsLayoutOnPortrait;
+		readonly Grid buttonsLayoutOnLandscape;
 
 		readonly Button
 			btnBuy      = new Button(),
@@ -42,46 +32,69 @@ namespace JP.InvestCalc
 		private readonly Dictionary<string, (Label Shares, Entry Price, Label TotalValue, Label Return)>
 		stockIndex = new Dictionary<string, (Label Shares, Entry Price, Label TotalValue, Label Return)>();
 		
-		readonly static RowDefinition layoutRowHeaderHalf = new RowDefinition { Height = GridLength.Auto };
-		readonly static RowDefinition layoutRowOther = new RowDefinition { Height = GridLength.Auto };
-		readonly static ColumnDefinitionCollection layoutCols;
-		readonly static LayoutOptions layoutFillOption = new LayoutOptions(LayoutAlignment.Fill, true);
-		readonly static LayoutOptions layoutEndOption  = new LayoutOptions(LayoutAlignment.End, false);
+		readonly RowDefinition layoutRowHeaderHalf = new RowDefinition { Height = GridLength.Auto };
+		readonly RowDefinition layoutRowOther = new RowDefinition { Height = GridLength.Auto };
+		readonly ColumnDefinitionCollection layoutCols;
 
-		static PageMain()
+		public PageMain()
+		{
+			ExperimentalFeatures.Enable("ShareFileRequest_Experimental");
+
+			ConstructLayouts(out layoutCols, out buttonsLayoutOnPortrait, out buttonsLayoutOnLandscape);
+
+			this.Content = flipLayout;
+			flipLayout.BackgroundColor = Format.BackgroundColor;
+
+			var verticalLayout = new StackLayout { HorizontalOptions = LayoutOptions.FillAndExpand };
+			verticalLayout.Children.Add(CreateAverageReturnView());
+			verticalLayout.Children.Add(CreateStocksView());
+			flipLayout.Children.Add(verticalLayout);
+
+			PrepareLayouts();
+			SizeChanged += OnSizeChanged;
+			SetButtonEvents();
+
+			RefreshPortfolio();
+		}
+
+		private static void ConstructLayouts(
+			out ColumnDefinitionCollection layoutCols,
+			out Grid buttonsLayoutOnPortrait,
+			out Grid buttonsLayoutOnLandscape)
 		{
 			var layoutCol = new ColumnDefinition { Width = GridLength.Star };
 			layoutCols = new ColumnDefinitionCollection { layoutCol, layoutCol, layoutCol, layoutCol };
 
-			ExperimentalFeatures.Enable("ShareFileRequest_Experimental");
+			buttonsLayoutOnPortrait = new Grid
+			{
+				ColumnDefinitions = layoutCols,
+				HorizontalOptions = LayoutOptions.FillAndExpand,
+				VerticalOptions   = LayoutOptions.End,
+			};
+			buttonsLayoutOnLandscape = new Grid
+			{
+				HorizontalOptions = LayoutOptions.End,
+				VerticalOptions   = LayoutOptions.FillAndExpand,
+			};
 		}
 
-		public PageMain()
+		private void SetButtonEvents()
 		{
-			this.Content = flipLayout;
-			flipLayout.BackgroundColor = Format.BackgroundColor;
-
-			var verticalLayout = new StackLayout { HorizontalOptions = layoutFillOption };
-			verticalLayout.Children.Add(CreateAverageReturnView());
-			verticalLayout.Children.Add(CreateStocksView());
-			flipLayout.Children.Add(verticalLayout);
-			
-			PrepareLayouts();
-			SizeChanged += OnSizeChanged;
-
 			btnOptions.Clicked += PromptOptions;
-			btnHistory.Clicked += async (s,e) => await Navigation.PushModalAsync(new PageHistory(
+
+			btnHistory.Clicked += async (s, e) => await Navigation.PushModalAsync(new PageHistory(
 				model.Data.GetFlowEditor(),
 				GetAllStockNames()));
 
-			RefreshPortfolio();
+			btnBuy.Clicked += async (s,e) => await Navigation.PushModalAsync(
+				PageOperation.BuyNewStock(model.Portfolio, this));
 		}
 
 		private View CreateStocksView() => new ScrollView
 		{
 			Content = stocksLayout,
-			HorizontalOptions = layoutFillOption,
-			VerticalOptions   = layoutFillOption,
+			HorizontalOptions = LayoutOptions.FillAndExpand,
+			VerticalOptions   = LayoutOptions.FillAndExpand,
 			Padding = 10,
 		};
 
@@ -143,9 +156,9 @@ namespace JP.InvestCalc
 			TryCalcReturnAvg();
 		}
 
-		public void InvokeOnUIThread(Action action) => MainThread.BeginInvokeOnMainThread(action);
+		void PortfolioView.InvokeOnUIThread(Action action) => MainThread.BeginInvokeOnMainThread(action);
 
-		public void AddStock(string name, double shares, double? returnPer1Yearly)
+		void PortfolioView.AddStock(string name, double shares, double? returnPer1Yearly)
 		{
 			var stockGrid = new Grid { ColumnDefinitions = layoutCols };
 			stocksLayout.Children.Add(stockGrid);
@@ -196,21 +209,21 @@ namespace JP.InvestCalc
 				++icol, irow);
 
 			if(returnPer1Yearly.HasValue)
-				fields.Return.Text = returnPer1Yearly.FormatPerCent();
+				fields.Return.Text = returnPer1Yearly.Value.FormatPerCent();
 
 			fields.Price.Completed += (s,e) => OnPriceChanged(name);
 
 			stockIndex.Add(name, fields);
 		}
 
-		public void SetStockFigures(Stock stk, double? returnPer1Yearly)
+		void PortfolioView.SetStockFigures(Stock stk, double? returnPer1Yearly)
 		{
 			var fields = stockIndex[stk.Name];
 			fields.Shares.Text = stk.Shares.FormatShares();
 			if(stk.Price.HasValue)
 			{
 				fields.Price.Text = stk.Price.ToString();
-				fields.TotalValue.Text = (stk.Price * stk.Shares).FormatMoney();
+				fields.TotalValue.Text = (stk.Price * stk.Shares).Value.FormatMoney();
 			}
 			else
 			{
@@ -218,7 +231,7 @@ namespace JP.InvestCalc
 				fields.TotalValue.Text = Format.ValueOnUnknownPrice(stk.Shares);
 			}
 			if(returnPer1Yearly.HasValue)
-				fields.Return.Text = returnPer1Yearly.FormatPerCent();
+				fields.Return.Text = returnPer1Yearly.Value.FormatPerCent();
 			else
 				fields.Return.Text = null;
 
@@ -285,7 +298,7 @@ namespace JP.InvestCalc
 		{
 			var fields = stockIndex[stockName];
 
-			var stk = model.Portfolio.GetStock(stockName);
+			var stk = model.Portfolio[stockName];
 			if(double.TryParse(fields.Price.Text, out var price))
 			{
 				fields.TotalValue.Text = (price * stk.Shares).FormatMoney();
@@ -324,32 +337,34 @@ namespace JP.InvestCalc
 				"History",
 				"Enter fetch code",
 				"Edit stock name");
-			switch(option)
+
+			if(option == "History")
 			{
-				case "History":
-					await Navigation.PushModalAsync(new PageHistory(model.Data.GetFlowEditor(), stockName));
-					break;
-
-				case "Enter fetch code":
-					string code = await DisplayPromptAsync(stockName, "Enter fetch code");
-					if(null == code)
-						break;
-					model.Data.SetFetchCode(stockName, code);
-					RefreshPortfolio();
-					break;
-
-				case "Edit stock name":
-					string newName = await DisplayPromptAsync(stockName, "Enter a new name",
-						initialValue: stockName);
-					if(string.IsNullOrWhiteSpace(newName))
-						break;
-					model.Data.SetStockName(stockName, newName);
-					RefreshPortfolio();
-					break;
-					
-				case "Cancel":
-				default:
+				await Navigation.PushModalAsync(new PageHistory(model.Data.GetFlowEditor(), stockName));
+			}
+			else if(option =="Enter fetch code")
+			{
+				string code = await DisplayPromptAsync(stockName, "Enter fetch code");
+				if(null == code)
 					return;
+				model.Data.SetFetchCode(stockName, code);
+				RefreshPortfolio();
+			}
+			else if(option == "Edit stock name")
+			{
+				string newName = await DisplayPromptAsync(stockName, "Enter a new name",
+					initialValue: stockName);
+				if(string.IsNullOrWhiteSpace(newName))
+					return;
+				model.Data.SetStockName(stockName, newName);
+				RefreshPortfolio();
+			}
+			else
+			{
+				var operation = Operation.All.SingleOrDefault(op => op.Text == option);
+				if(operation != null)
+					await Navigation.PushModalAsync(
+						PageOperation.OnExistingStock(operation, stockName, model.Portfolio, this));
 			}
 		}
 
@@ -404,7 +419,7 @@ namespace JP.InvestCalc
 		}
 
 
-		private static string GetPriceAPILicense()
+		private static string? GetPriceAPILicense()
 		{
 			var pathName = GetAPILicenseFileName();
 			if(!File.Exists(pathName)) return null;

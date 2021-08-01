@@ -53,7 +53,7 @@ namespace JP.InvestCalc
 				var fetched = done.Result;
 				if(fetched.IsFaulted) continue;
 
-				var stk = portfolio.GetStock(fetched.StockName);
+				var stk = portfolio[fetched.StockName];
 				stk.Price = fetched.Price;
 
 				view?.InvokeOnUIThread(() => display.SetStockInView(stk, view));

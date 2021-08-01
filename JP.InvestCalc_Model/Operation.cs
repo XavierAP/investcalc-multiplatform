@@ -21,14 +21,21 @@ namespace JP.InvestCalc
 			this.MoneyMinus   = moneyMinus;
 		}
 		
-		public readonly static Operation
+		public readonly static Operation Buy, Sell, Dividend, Cost;
+		public readonly static Operation[] All;
+
+		static Operation()
+		{
 			Buy = new Operation("Buy",
-				sharesChange: true , sharesMinus: false, moneyMinus: true ),
+				sharesChange: true , sharesMinus: false, moneyMinus: true );
 			Sell = new Operation("Sell",
-				sharesChange: true , sharesMinus: true , moneyMinus: false),
+				sharesChange: true , sharesMinus: true , moneyMinus: false);
 			Dividend = new Operation("Dividend",
-				sharesChange: false, sharesMinus: false, moneyMinus: false),
+				sharesChange: false, sharesMinus: false, moneyMinus: false);
 			Cost = new Operation("Cost",
 				sharesChange: false, sharesMinus: false, moneyMinus: true );
+
+			All = new[] { Buy, Sell, Dividend, Cost };
+		}
 	}
 }

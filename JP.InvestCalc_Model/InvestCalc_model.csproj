@@ -9,7 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\libs_NET\JP.Maths\JP.Maths.csproj" />
     <ProjectReference Include="..\..\libs_NET\JP.SQLite\JP.SQLite\JP.SQLite.csproj" />
-    <ProjectReference Include="..\..\libs_NET\JP.Utils\JP.Utils.csproj" />
+    <ProjectReference Include="..\..\libs_NET\JP.Utils\JP.Utils\JP.Utils.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -30,7 +30,7 @@ namespace JP.Utils
 			File.Move(backupPath, filePath);
 		}
 
-		public static async Task<IOException> TryCopy(Stream origin, string destinationFilePath)
+		public static async Task<IOException?> TryCopy(Stream origin, string destinationFilePath)
 		{
 			bool replacing = File.Exists(destinationFilePath);
 			if(replacing)

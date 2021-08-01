@@ -4,6 +4,8 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
     <RootNamespace>JP.InvestCalc</RootNamespace>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\libs_NET\JP.Utils\JP.Utils.Xamarin\JP.Utils.Xamarin.csproj" />
     <ProjectReference Include="..\JP.InvestCalc_Model\InvestCalc_model.csproj" />
   </ItemGroup>
 </Project>

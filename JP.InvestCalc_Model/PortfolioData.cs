@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -7,7 +8,7 @@ namespace JP.InvestCalc
 {
 	using Portfolio = SortedDictionary<string, Stock>;
 
-	public class PortfolioData
+	public class PortfolioData : IReadOnlyDictionary<string, Stock>
 	{
 		private readonly Portfolio stocks = new Portfolio(StringComparer.CurrentCultureIgnoreCase);
 		private readonly Database database;
@@ -21,8 +22,6 @@ namespace JP.InvestCalc
 			this.priceFetcher = new PriceFetcher(this, display);
 		}
 
-		public Stock GetStock(string name) => stocks[name];
-		
 		internal string ApiLicense
 		{
 			get => priceFetcher.ApiLicenseKey;
@@ -87,5 +86,22 @@ namespace JP.InvestCalc
 				FetchPrices(stockName, view);
 			}
 		}
+
+		#region IReadOnlyDictionary implementation
+
+		public IEnumerable<string> Keys => stocks.Keys;
+		public IEnumerable<Stock> Values => stocks.Values;
+		public int Count => stocks.Count;
+
+		public Stock this[string key] => stocks[key];
+		public bool ContainsKey(string key) => stocks.ContainsKey(key);
+		public bool TryGetValue(string key, out Stock value) => stocks.TryGetValue(key, out value);
+
+		IEnumerator<KeyValuePair<string, Stock>>
+		IEnumerable<KeyValuePair<string, Stock>>.GetEnumerator() => stocks.GetEnumerator();
+
+		IEnumerator IEnumerable.GetEnumerator() => stocks.GetEnumerator();
+
+		#endregion
 	}
 }

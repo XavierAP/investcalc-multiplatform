@@ -38,7 +38,7 @@ namespace JP.InvestCalc
 			SelectionChanged(null, null);
 		}
 
-		public void AddStock(string name, double shares, double? returnPer1Yearly)
+		void PortfolioView.AddStock(string name, double shares, double? returnPer1Yearly)
 		{
 			table.Rows.Add(name, shares, null, null,
 				returnPer1Yearly.HasValue ? (object)returnPer1Yearly.Value : null);
@@ -46,7 +46,7 @@ namespace JP.InvestCalc
 			txtReturnAvg.Text = null;
 		}
 
-		public void SetStockFigures(Stock stk, double? returnPer1Yearly)
+		void PortfolioView.SetStockFigures(Stock stk, double? returnPer1Yearly)
 		{
 			var irow = GetRow(stk.Name);
 			GetCell(irow, colShares).Value = stk.Shares;
@@ -68,7 +68,7 @@ namespace JP.InvestCalc
 			TryCalcReturnAvg(table.Rows);
 		}
 
-		public void InvokeOnUIThread(Action action) => Invoke(action);
+		void PortfolioView.InvokeOnUIThread(Action action) => Invoke(action);
 
 
 		private void FillTable()
@@ -178,12 +178,8 @@ namespace JP.InvestCalc
 
 		private void OpRecord(Operation op)
 		{
-			using(var dlg = new FormOp(op, GetPortfolio()))
-			{
-				var ans = dlg.ShowDialog(this);
-				if(ans != DialogResult.OK) return;
-				Model.Portfolio.AddShares(this, dlg.StockName, dlg.Shares, dlg.Total, dlg.Date, dlg.Comment);
-			}
+			using var dlg = new FormOp(op, Model.Portfolio, this);
+			var ans = dlg.ShowDialog(this);
 		}
 
 
@@ -262,14 +258,6 @@ namespace JP.InvestCalc
 
 		private static void SetInitialDirectory(FileDialog dlg) =>
 			dlg.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-
-		private Dictionary<string, double>
-		GetPortfolio() => (
-			from DataGridViewRow row in table.Rows
-			let name   = (string)GetCell(row.Index, colStock ).Value
-			let shares = (double)GetCell(row.Index, colShares).Value
-			select (name, shares)
-			).ToDictionary(tuple => tuple.name, tuple => tuple.shares);
 
 		private DataGridViewCell
 		GetCell(int irow, DataGridViewColumn col)
