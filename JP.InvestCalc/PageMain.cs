@@ -415,7 +415,8 @@ namespace JP.InvestCalc
 			if(license == null) return;
 
 			File.WriteAllText(GetAPILicenseFileName(), license);
-			Environment.Exit(0);
+			model.ApiLicenseKey = license;
+			RefreshPortfolio();
 		}
 
 
