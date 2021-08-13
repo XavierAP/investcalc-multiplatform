@@ -36,6 +36,8 @@ namespace JP.InvestCalc
 		readonly RowDefinition layoutRowOther = new RowDefinition { Height = GridLength.Auto };
 		readonly ColumnDefinitionCollection layoutCols;
 
+		readonly OrientationFlipBehavior orientationBehavior;
+
 		public PageMain()
 		{
 			ExperimentalFeatures.Enable("ShareFileRequest_Experimental");
@@ -50,8 +52,10 @@ namespace JP.InvestCalc
 			verticalLayout.Children.Add(CreateStocksView());
 			flipLayout.Children.Add(verticalLayout);
 
+			orientationBehavior = new OrientationFlipBehavior(this);
+			orientationBehavior.Flipped += OnOrientationFlipped;
+
 			PrepareLayouts();
-			SizeChanged += OnSizeChanged;
 			SetButtonEvents();
 
 			RefreshPortfolio();
@@ -114,30 +118,15 @@ namespace JP.InvestCalc
 			return view;
 		}
 
-		private void OnSizeChanged(object sender, EventArgs ea)
+		
+		private void OnOrientationFlipped(Orientation orientation)
 		{
-			if(Width > Height)
-				PageOrientation = Orientation.Landscape;
+			ResetLayout();
+			if(orientation == Orientation.Landscape)
+				SetLayoutLandscape();
 			else
-				PageOrientation = Orientation.Portrait;
+				SetLayoutPortrait();
 		}
-
-		private Orientation PageOrientation
-		{
-			set
-			{
-				if(value == _PageOrientation) return;
-
-				ResetLayout();
-				if(value == Orientation.Landscape)
-					SetLayoutLandscape();
-				else
-					SetLayoutPortrait();
-
-				_PageOrientation = value;
-			}
-		}
-		private Orientation _PageOrientation = Orientation.NotSet;
 
 
 		private void RefreshPortfolio()
