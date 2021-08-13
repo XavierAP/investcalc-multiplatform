@@ -18,24 +18,24 @@ namespace JP.InvestCalc
 			};
 			for(int i = 0; i < 6; i++)
 				table.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+			
+			AddHeaders();
+			foreach(var row in data.GetFlowDetailsOrdered(stockNames, DateTime.MinValue, DateTime.Now))
+				AddRow(
+					row.Date.ToShortDateString(),
+					row.StockName,
+					row.Shares.FormatShares(),
+					row.Flow.FormatMoney(),
+					row.PriceAvg.FormatMoney(),
+					row.Comment);
+		}
 
+		private void AddHeaders()
+		{
 			AddRow("Date", "Stock", "Shares", "Flow", "Price", "Comment");
 			foreach(Label header in table.Children)
 				header.FontAttributes = FontAttributes.Bold;
-
-			foreach(var row in data.GetFlowDetailsOrdered(stockNames, DateTime.MinValue, DateTime.Now))
-				AddRow(row);
 		}
-
-		private void AddRow(in (long Id, DateTime Date, string StockName,
-			double Shares, double Flow, double PriceAvg, string Comment) row
-			) => AddRow(
-				row.Date.ToShortDateString(),
-				row.StockName,
-				row.Shares.FormatShares(),
-				row.Flow.FormatMoney(),
-				row.PriceAvg.FormatMoney(),
-				row.Comment);
 
 		private void AddRow(string date, string stockName, string shares, string flow, string price, string comment)
 		{
