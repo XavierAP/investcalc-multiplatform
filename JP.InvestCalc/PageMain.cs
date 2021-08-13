@@ -53,7 +53,7 @@ namespace JP.InvestCalc
 			flipLayout.Children.Add(verticalLayout);
 
 			orientationBehavior = new OrientationFlipBehavior(this);
-			orientationBehavior.Flipped += OnOrientationFlipped;
+			orientationBehavior.SetOrChanged += OnOrientationSetOrChanged;
 
 			PrepareLayouts();
 			SetButtonEvents();
@@ -119,10 +119,10 @@ namespace JP.InvestCalc
 		}
 
 		
-		private void OnOrientationFlipped(Orientation orientation)
+		private void OnOrientationSetOrChanged(Orientation orientation)
 		{
 			ResetLayout();
-			if(orientation == Orientation.Landscape)
+			if(Orientation.Landscape == orientation)
 				SetLayoutLandscape();
 			else
 				SetLayoutPortrait();
