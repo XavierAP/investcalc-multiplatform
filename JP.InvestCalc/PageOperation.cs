@@ -71,15 +71,17 @@ namespace JP.InvestCalc
 			AddElement(button);
 
 			button = new Button { Text = "Cancel" };
-			button.Clicked += (s,e) => OnBackButtonPressed();
+			button.Clicked += async (s,e) => await Close();
 			AddElement(button);
 		}
 
 		private async void TryCommitAndClose(object sender, EventArgs ea)
 		{
 			bool ok = await dataWriter.Record(operation);
-			if(ok) await Navigation.PopModalAsync();
+			if(ok) await Close();
 		}
+
+		private async Task Close() => await Navigation.PopModalAsync();
 
 		#region OperationDialog implementation
 
@@ -95,13 +97,13 @@ namespace JP.InvestCalc
 		DateTime OperationDialog.Date => date.Date;
 		string OperationDialog.Comment => comment.Text;
 
-		async Task<bool> OperationDialog.PromptConfirmation(string message)
+		Task<bool> OperationDialog.PromptConfirmation(string message)
 		{
-			return await DisplayAlert("Please confirm", message, "Yes", "No");
+			return this.PromptConfirmation(message);
 		}
-		async Task OperationDialog.PromptError(string message)
+		Task OperationDialog.PromptError(string message)
 		{
-			await DisplayAlert("Invalid", message, "OK");
+			return DisplayAlert("Invalid", message, "OK");
 		}
 
 		void OperationDialog.OnErrorEmptyStockName() => stockName.AsView.Focus();

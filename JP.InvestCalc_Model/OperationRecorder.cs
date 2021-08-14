@@ -40,7 +40,7 @@ namespace JP.InvestCalc
 
 		public async Task<bool> Record(Operation op)
 		{
-			if(HasError(op))
+			if(await HasError(op))
 				return false;
 
 			if(!await ConfirmByUser(op))
@@ -54,11 +54,11 @@ namespace JP.InvestCalc
 			return true;
 		}
 
-		private bool HasError(Operation op)
+		private async Task<bool> HasError(Operation op)
 		{
 			if(string.IsNullOrEmpty(dialog.StockName))
 			{
-				dialog.PromptError("You must select a stock name.");
+				await dialog.PromptError("You must select a stock name.");
 				dialog.OnErrorEmptyStockName();
 				return true;
 			}
@@ -66,7 +66,7 @@ namespace JP.InvestCalc
 
 			if(dialog.Shares < 0 || dialog.TotalMoney < 0)
 			{
-				dialog.PromptError("Do not enter negative numbers.");
+				await dialog.PromptError("Do not enter negative numbers.");
 				return true;
 			}
 			if(op.SharesChange && dialog.Shares == 0)
@@ -76,13 +76,13 @@ namespace JP.InvestCalc
 					OnlyAddingStockToPortfolioNotBuyingAnyShares = true;
 					return false;
 				}
-				dialog.PromptError("You must enter an amount of shares.");
+				await dialog.PromptError("You must enter an amount of shares.");
 				dialog.OnErrorZeroShares();
 				return true;
 			}
 			if(!op.SharesChange && dialog.TotalMoney == 0)
 			{
-				dialog.PromptError("You must enter a money amount.");
+				await dialog.PromptError("You must enter a money amount.");
 				dialog.OnErrorZeroMoney();
 				return true;
 			}
@@ -90,7 +90,7 @@ namespace JP.InvestCalc
 			{
 				if(op.SharesMinus && dialog.Shares > owned.Shares)
 				{
-					dialog.PromptError("Cannot sell more shares than you own.");
+					await dialog.PromptError("Cannot sell more shares than you own.");
 					dialog.OnErrorSellingMoreSharesThanOwned(owned.Shares);
 					return true;
 				}
