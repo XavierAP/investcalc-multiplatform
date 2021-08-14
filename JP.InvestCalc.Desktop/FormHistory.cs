@@ -51,7 +51,7 @@ namespace JP.InvestCalc
 				var igui =
 				table.Rows.Add(r.Date, r.StockName, r.Shares, r.Flow, r.PriceAvg, r.Comment);
 				(rowsOrdered[idata] = table.Rows[igui])
-					.Tag = r.Id;
+					.Tag = r.DatabaseId;
 			}
 			Debug.Assert(rowsOrdered.Length == table.Rows.Count);
 

@@ -11,11 +11,11 @@ namespace JP.InvestCalc
 
 		public bool IsDataChanged => database.IsPortfolioChanged;
 
-		public List<(long Id, DateTime Date, string StockName, double Shares, double Flow, double PriceAvg, string Comment)>
+		public List<(long DatabaseId, DateTime Date, string StockName, double Shares, double Flow, double PriceAvg, string Comment)>
 		GetFlowDetailsOrdered(string[] stockNames, DateTime dateFrom, DateTime dateTo)
 			=> database.GetFlowDetailsOrdered(stockNames, dateFrom, dateTo);
 
-		public void DeleteFlows(IEnumerable<long> ids) => database.DeleteFlows(ids);
+		public void DeleteFlows(IEnumerable<long> databaseIds) => database.DeleteFlows(databaseIds);
 
 		public int ImportFlows(string csv, string separator) => database.ImportFlows(csv, separator);
 	}
