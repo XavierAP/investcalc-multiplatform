@@ -36,8 +36,6 @@ namespace JP.InvestCalc
 		readonly RowDefinition layoutRowOther = new RowDefinition { Height = GridLength.Auto };
 		readonly ColumnDefinitionCollection layoutCols;
 
-		readonly OrientationFlipBehavior orientationBehavior;
-
 		public PageMain()
 		{
 			ExperimentalFeatures.Enable("ShareFileRequest_Experimental");
@@ -52,8 +50,7 @@ namespace JP.InvestCalc
 			verticalLayout.Children.Add(CreateStocksView());
 			flipLayout.Children.Add(verticalLayout);
 
-			orientationBehavior = new OrientationFlipBehavior(this);
-			orientationBehavior.SetOrChanged += OnOrientationSetOrChanged;
+			new OrientationFlipBehavior(this).SetOrChanged += OnOrientationSetOrChanged;
 
 			PrepareLayouts();
 			SetButtonEvents();
