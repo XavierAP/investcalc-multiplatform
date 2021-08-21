@@ -259,7 +259,7 @@
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties XamarinHotReloadGenericExceptionInfoBarInvestCalcAndroidHideInfoBar="True" XamarinHotReloadDebuggerTimeoutExceptionInvestCalcAndroidHideInfoBar="True" TriggeredFromHotReload="False" />
+      <UserProperties TriggeredFromHotReload="False" XamarinHotReloadDebuggerTimeoutExceptionInvestCalcAndroidHideInfoBar="True" XamarinHotReloadGenericExceptionInfoBarInvestCalcAndroidHideInfoBar="True" />
     </VisualStudio>
   </ProjectExtensions>
   <Import Project="..\packages\Xamarin.Android.Support.Annotations.28.0.0.3\build\monoandroid90\Xamarin.Android.Support.Annotations.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Annotations.28.0.0.3\build\monoandroid90\Xamarin.Android.Support.Annotations.targets')" />

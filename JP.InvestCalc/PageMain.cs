@@ -51,10 +51,8 @@ namespace JP.InvestCalc
 			flipLayout.Children.Add(verticalLayout);
 
 			new OrientationFlipBehavior(this).SetOrChanged += OnOrientationSetOrChanged;
-
 			PrepareLayouts();
 			SetButtonEvents();
-
 			RefreshPortfolio();
 		}
 
@@ -83,9 +81,7 @@ namespace JP.InvestCalc
 		{
 			btnOptions.Clicked += PromptOptions;
 
-			btnHistory.Clicked += async (s, e) => await Navigation.PushModalAsync(new PageHistory(
-				model.Data.GetFlowEditor(),
-				GetAllStockNames()));
+			btnHistory.Clicked += async (s, e) => await DisplayHistory(GetAllStockNames());
 
 			btnBuy.Clicked += async (s,e) => await Navigation.PushModalAsync(
 				PageOperation.BuyNewStock(model.Portfolio, this));
@@ -326,7 +322,7 @@ namespace JP.InvestCalc
 
 			if(option == "History")
 			{
-				await Navigation.PushModalAsync(new PageHistory(model.Data.GetFlowEditor(), stockName));
+				await DisplayHistory(stockName);
 			}
 			else if(option =="Enter fetch code")
 			{
@@ -354,6 +350,16 @@ namespace JP.InvestCalc
 			}
 		}
 
+		private async Task DisplayHistory(params string[] stockNames)
+		{
+			var history = new PageHistory(model.Data.GetFlowEditor(), stockNames);
+			history.Disappearing += (s,e) =>
+			{
+				if(history.HasChanged)
+					RefreshPortfolio();
+			};
+			await Navigation.PushModalAsync(history);
+		}
 
 		private async void PromptOptions(object sender, EventArgs ea)
 		{
