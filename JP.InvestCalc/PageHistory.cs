@@ -56,7 +56,6 @@ namespace JP.InvestCalc
 			if(!confirmed) return;
 
 			DeleteLastRecordFromDatabase();
-			HasChanged = true;
 			DeleteLastRecordFromUI();
 			if(IsEmpty) await Close();
 		}
@@ -125,6 +124,7 @@ namespace JP.InvestCalc
 			databaseIdCache[0] = databaseIds[lastIndex];
 			databaseIds.RemoveAt(lastIndex);
 			data.DeleteFlows(databaseIdCache);
+			HasChanged = true;
 		}
 
 		private void DeleteLastRecordFromUI()
