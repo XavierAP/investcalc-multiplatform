@@ -23,6 +23,7 @@ namespace JP.InvestCalc
 		readonly RowDefinition rowLayout = new RowDefinition { Height = GridLength.Auto };
 
 		public bool HasChanged { get; private set; } = false;
+		private bool IsEmpty => databaseIds.Count < 1;
 
 		public PageHistory(FlowEditor data, params string[] stockNames)
 		{
@@ -51,13 +52,13 @@ namespace JP.InvestCalc
 
 		private async void DoDelete(object sender, EventArgs args)
 		{
-			bool confirmed = await this.PromptConfirmation("Are you sure you want to delete the selected record?");
+			bool confirmed = await this.PromptConfirmation("Are you sure you want to delete the last record?");
 			if(!confirmed) return;
 
 			DeleteLastRecordFromDatabase();
 			HasChanged = true;
 			DeleteLastRecordFromUI();
-			await ExitIfNoRecordsLeft();
+			if(IsEmpty) await Close();
 		}
 
 		private async Task Close() => await Navigation.PopModalAsync();
@@ -65,9 +66,14 @@ namespace JP.InvestCalc
 		private void OnOrientationSetOrChanged(Orientation orientation)
 		{
 			if(Orientation.Portrait == orientation)
-				flipLayout.Children.Add(btnDeleteLast);
+			{
+				if(!IsEmpty)
+					flipLayout.Children.Add(btnDeleteLast);
+			}
 			else
+			{
 				flipLayout.Children.Remove(btnDeleteLast);
+			}
 		}
 
 		private void AddHeaders()
@@ -111,12 +117,6 @@ namespace JP.InvestCalc
 				icol++, irow);
 
 			Debug.Assert(icol == nColumns);
-		}
-
-		private async Task ExitIfNoRecordsLeft()
-		{
-			if(databaseIds.Count < 1)
-				await Close();
 		}
 
 		private void DeleteLastRecordFromDatabase()
