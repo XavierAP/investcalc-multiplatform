@@ -390,14 +390,12 @@ namespace JP.InvestCalc
 		{
 			var file = await FilePicker.PickAsync();
 			if(file == null) return;
-			using(var stream = await file.OpenReadAsync())
-			{
-				var err = await Files.TryCopy(stream, model.Data.FilePath);
-				if(err == null)
-					RefreshPortfolio();
-				else
-					await this.DisplayError(err);
-			}
+
+			var err = Files.TryCopy(file.FullPath, model.Data.FilePath);
+			if(err == null)
+				RefreshPortfolio();
+			else
+				await this.DisplayError(err);
 		}
 
 		private async Task PromptLicense()
