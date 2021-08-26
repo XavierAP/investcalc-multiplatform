@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 
 namespace JP.InvestCalc
 {
@@ -12,62 +11,43 @@ namespace JP.InvestCalc
 
 		internal DataImporter(SQLiteConnector connection) => this.connection = connection;
 
-		public int ImportFlows(string csv, string separator)
+		public int ImportFlows(string csv, CsvProcessor processor)
 		{
-			if(string.IsNullOrEmpty(separator)) throw new ArgumentNullException(nameof(separator));
-			if(string.IsNullOrWhiteSpace(csv)) throw new ArgumentNullException(nameof(csv));
-
 			int n = 0;
 			var records = new Dictionary<string, List<(DateTime Date, double Shares, double Flow, string Comment)>>();
 
-			var seps = new[] { separator };
+			foreach(var values in processor.Analize(csv))
+			{
+				if(values.Length < 4) throw new DataImportParseLineException(n, values);
 
-			string line;
-			using(var reader = new StringReader(csv))
-				while(null != (line = reader.ReadLine()))
+				int i = 0;
+				var date = ParseDate(values[i]);
+				string stock = values[++i];
+				var shares = ParseDouble(values[++i]);
+				var flow = ParseDouble(values[++i]);
+				var comment = values.Length > ++i ? // comments are optional
+					values[i] : null;
+
+				if(!records.TryGetValue(stock, out var stockRecords))
 				{
-					if(string.IsNullOrWhiteSpace(line)) continue;
-
-					var values = line.Split(seps,
-						StringSplitOptions.RemoveEmptyEntries); // allow the user to have entered e.g. several tabs in a row for visual reasons; only the last column (comment) may optionally be empty
-
-					if(values.Length < 4)
-						throw new DataImportParseLineException(line);
-
-					int i = 0;
-
-					var dateText = values[i].Trim();
-					if(!DateTime.TryParse(dateText, out DateTime date))
-						throw new DataImportParseValueException(dateText, "date");
-
-					Debug.Assert(date.Kind == DateTimeKind.Unspecified); // from TryParse(); considered local
-					date = date.Date.ToUniversalTime();
-
-					string stock = values[++i].Trim();
-
-					var sharesText = values[++i].Trim();
-					if(!double.TryParse(sharesText, out double shares))
-						throw new DataImportParseValueException(sharesText, "number");
-
-					var flowText = values[++i].Trim();
-					if(!double.TryParse(flowText, out double flow))
-						throw new DataImportParseValueException(flowText, "number");
-
-					var comment = values.Length > ++i ? // comments are optional
-						values[i].Trim() : null;
-
-					if(!records.TryGetValue(stock, out var stockRecords))
-						records.Add(stock,
-						stockRecords = new List<(DateTime Date, double Shares, double Flow, string Comment)>(csv.Length / 20 - n)
-						);
-					stockRecords.Add((date, shares, flow, comment));
-
-					++n;
+					records.Add(stock, stockRecords =
+						new List<(DateTime Date, double Shares, double Flow, string Comment)>(csv.Length / 20 - n));
 				}
+				stockRecords.Add((date, shares, flow, comment));
+
+				++n;
+			}
 
 			foreach(var rec in records.Values)
 				rec.Sort(CompareFlows); // ORDER by utcDate, shares DESC
+			
+			connection.Write(ComposeSql(n, records));
+			return n;
+		}
 
+		private List<string> ComposeSql(int n,
+			Dictionary<string, List<(DateTime Date, double Shares, double Flow, string Comment)>> records)
+		{
 			var sql = new List<string>(n + records.Count);
 
 			/* We must now check that the records are not absurd
@@ -116,10 +96,7 @@ $@"INSERT into Flows values (
 )");
 				}
 			}
-
-			// All Korrect, finally! write to the database:
-			connection.Write(sql);
-			return n;
+			return sql;
 		}
 
 		private static int CompareFlows(
@@ -136,6 +113,22 @@ $@"INSERT into Flows values (
 				return 1;
 			else
 				return 0;
+		}
+
+		private static double ParseDouble(string text)
+		{
+			if(!double.TryParse(text, out double number))
+				throw new DataImportParseValueException(text, "number");
+
+			return number;
+		}
+
+		private static DateTime ParseDate(string text)
+		{
+			if(!DateTime.TryParse(text, out DateTime date))
+				throw new DataImportParseValueException(text, "date");
+
+			return date.ToUniversalTime();
 		}
 	}
 }

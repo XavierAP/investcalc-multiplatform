@@ -17,6 +17,6 @@ namespace JP.InvestCalc
 
 		public void DeleteFlows(IEnumerable<long> databaseIds) => database.DeleteFlows(databaseIds);
 
-		public int ImportFlows(string csv, string separator) => database.ImportFlows(csv, separator);
+		public int ImportFlows(string csv, CsvProcessor processor) => database.ImportFlows(csv, processor);
 	}
 }

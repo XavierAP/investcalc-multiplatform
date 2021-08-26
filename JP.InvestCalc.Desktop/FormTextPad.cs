@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace JP.InvestCalc
@@ -7,13 +8,10 @@ namespace JP.InvestCalc
 	{
 		public string Content => txt.Text;
 
-		private readonly string[] headers;
-
-		public FormTextPad(bool readOnly, string[] headers, string content)
+		public FormTextPad(bool readOnly, IReadOnlyList<string> headers, string content)
 		{
 			InitializeComponent();
 
-			this.headers = headers;
 			const string textSeparator = ", "; // not the same used for values
 			lblHeaders.Text = string.Join(textSeparator, headers);
 			txt.ReadOnly = readOnly;
@@ -55,7 +53,7 @@ namespace JP.InvestCalc
 		private void PromptHelpInput(object sender, EventArgs ea)
 		{
 			MessageBox.Show(this, $@"Enter the CSV into this Window, then close it to continue importing.
-Enter values for the {headers.Length} columns enumerated above; do not include price; comments are optional.
+Enter values for the columns enumerated above; do not include price; comments are optional.
 Use separator
 «{Properties.Settings.Default.csvSeparator}»
 (or change this separator in the .config file and restart the app).", Config.AppName, MessageBoxButtons.OK, MessageBoxIcon.Information);

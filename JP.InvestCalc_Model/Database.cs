@@ -35,9 +35,9 @@ namespace JP.InvestCalc
 		}
 
 
-		public int ImportFlows(string csv, string separator)
+		public int ImportFlows(string csv, CsvProcessor processor)
 		{
-			var n = new DataImporter(Connection).ImportFlows(csv, separator);
+			var n = new DataImporter(Connection).ImportFlows(csv, processor);
 			IsPortfolioChanged = true;
 			return n;
 		}

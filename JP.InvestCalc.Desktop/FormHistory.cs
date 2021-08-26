@@ -1,9 +1,8 @@
-﻿using JP.SQLite;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace JP.InvestCalc
@@ -58,13 +57,13 @@ namespace JP.InvestCalc
 			headers = (
 				from c in DataColumns
 				select table.Columns[c].HeaderText
-				).ToArray();
+				).ToList();
 		}
 
 
 		private IEnumerable<int> DataColumns =>
 			from DataGridViewColumn col in table.Columns
-			where col != colPrice // the avg price is derived data for info
+			where col != colPrice // skip, price = flow/shares, displayed for info
 			select col.Index;
 
 
@@ -149,29 +148,25 @@ namespace JP.InvestCalc
 		}
 
 
-		private readonly StringBuilder csv = new StringBuilder();
-		private readonly string csvSeparator = GetCSVSeparator();
+		readonly CsvProcessor csv = new CsvProcessor(GetCSVSeparator());
 
-		private void DoExport(object sender, EventArgs ea)
+		private void DoExport(object sender, EventArgs args)
 		{
-			csv.Clear();
+			var values =
+				from DataGridViewRow row in table.Rows // iterate all .Rows to preserve display order; .SelectedRows may have a different order
+				where row.Selected
+				select (
+					from c in DataColumns
+					select row.Cells[c].Value
+					).ToList();
 
-			foreach(DataGridViewRow row in table.Rows) // iterate all .Rows to preserve display order; .SelectedRows may have a different order
-			{
-				if(!row.Selected) continue;
-
-				foreach(var c in DataColumns)
-					csv.Append(row.Cells[c].Value).Append(csvSeparator);
-
-				BackDown(csv, csvSeparator)
-					.AppendLine();
-			}
-
-			using(var dlg = new FormTextPad(true, headers, csv.ToString()))
+			using var csvText = new StringWriter();
+			csv.Synthesize(csvText, values);
+			using(var dlg = new FormTextPad(true, headers, csvText.ToString()))
 				dlg.ShowDialog(this);
 		}
 
-		private void DoImport(object sender, EventArgs ea)
+		private void DoImport(object sender, EventArgs args)
 		{
 			using(var dlg = new FormTextPad(false, headers, null))
 			{
@@ -181,7 +176,7 @@ namespace JP.InvestCalc
 					if(dlg.DialogResult == DialogResult.Cancel)
 						return;
 
-					try { n = model.ImportFlows(dlg.Content, csvSeparator); }
+					try { n = model.ImportFlows(dlg.Content, csv); }
 					catch(DataException err)
 					{
 						err.Display();
@@ -189,6 +184,8 @@ namespace JP.InvestCalc
 					}
 				}
 				while(n <= 0);
+				MessageBox.Show(n + " operations imported.", Config.AppName,
+					MessageBoxButtons.OK, MessageBoxIcon.Information);
 				Close(); // the displayed data are no longer up to date after importing
 			}
 		}
@@ -196,18 +193,11 @@ namespace JP.InvestCalc
 		private static string GetCSVSeparator()
 		{
 			string sep = Properties.Settings.Default.csvSeparator;
-			if(string.IsNullOrEmpty(sep)) sep = "\t";
+			if(string.IsNullOrEmpty(sep)) sep = Config.DefaultCsvSeparator;
 			return sep;
 		}
 
 
-		private static StringBuilder
-		BackDown(StringBuilder text, string trail)
-		{
-			Debug.Assert( text[text.Length - trail.Length] == trail[0] );
-			return text.Remove(text.Length - trail.Length, trail.Length);
-		}
-
-		private readonly string[] headers;
+		private readonly List<string> headers;
 	}
 }

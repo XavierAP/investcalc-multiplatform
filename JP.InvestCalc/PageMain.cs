@@ -12,7 +12,8 @@ namespace JP.InvestCalc
 {
 	internal sealed class PageMain : ContentPage, PortfolioView
 	{
-		private readonly ModelGateway model = new ModelGateway(GetDataFolder(), GetPriceAPILicense());
+		private readonly ModelGateway model = new ModelGateway(
+			Config.GetDataFolder(), GetPriceAPILicense());
 
 		readonly StackLayout flipLayout = new StackLayout();
 		readonly StackLayout stocksLayout = new StackLayout();
@@ -395,7 +396,7 @@ namespace JP.InvestCalc
 				if(err == null)
 					RefreshPortfolio();
 				else
-					await DisplayError(err);
+					await this.DisplayError(err);
 			}
 		}
 
@@ -420,12 +421,9 @@ namespace JP.InvestCalc
 			return File.ReadAllText(pathName).Trim();
 		}
 
-		private static string GetAPILicenseFileName() => Path.Combine(GetDataFolder(), "api-license.txt");
-
-		private static string GetDataFolder() => Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+		private static string GetAPILicenseFileName() => Path.Combine(
+			Config.GetDataFolder(), "api-license.txt");
 
 		private string[] GetAllStockNames() => stockIndex.Keys.ToArray();
-
-		private Task DisplayError(Exception err) => DisplayAlert("ERROR! " + err.GetType().Name, err.Message, "OK");
 	}
 }

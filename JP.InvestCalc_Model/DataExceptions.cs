@@ -10,8 +10,9 @@ namespace JP.InvestCalc
 
 	public sealed class DataImportParseLineException : DataException
 	{
-		public DataImportParseLineException(string line)
-			: base("Cannot parse columns from line: " + line) { }
+		public DataImportParseLineException(int lineNumberZeroBased, string[] lineValues)
+			: base($"Cannot parse columns from line {1+lineNumberZeroBased}: {string.Join(Config.DefaultCsvSeparator, lineValues)}")
+		{ }
 	}
 
 	public sealed class DataImportParseValueException : DataException
