@@ -411,7 +411,7 @@ namespace JP.InvestCalc
 		}
 
 
-		private static string? GetPriceAPILicense()
+		private static string GetPriceAPILicense()
 		{
 			var pathName = GetAPILicenseFileName();
 			if(!File.Exists(pathName)) return null;
