@@ -391,7 +391,7 @@ namespace JP.InvestCalc
 			var file = await FilePicker.PickAsync();
 			if(file == null) return;
 
-			var err = Files.TryCopy(file.FullPath, model.Data.FilePath);
+			var err = FileBackup.TryCopy(file.FullPath, model.Data.FilePath);
 			if(err == null)
 				RefreshPortfolio();
 			else
