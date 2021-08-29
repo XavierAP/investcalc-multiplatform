@@ -17,7 +17,7 @@ namespace JP.InvestCalc
 			iColPrice = 4;
 
 		readonly FlowEditor data;
-		readonly CsvProcessor csv = new CsvProcessor(Config.DefaultCsvSeparator);
+		CsvProcessor csv = new CsvProcessor(GetCsvSeparator());
 		readonly string tempCsvFile = Path.Combine(Path.GetTempPath(), "InvestCalc-history.csv");
 
 		readonly List<long> databaseIds;
@@ -183,7 +183,7 @@ namespace JP.InvestCalc
 			{
 				case "Export": await ExportCsvFile(); break;
 				case "Import": await ImportCsvFile(); break;
-				case "Configure": /*TODO*/ break;
+				case "Configure": await PromptCsvOptionConfig(); break;
 
 				case "Cancel":
 				default:
@@ -203,30 +203,29 @@ namespace JP.InvestCalc
 			});
 		}
 
-		private IEnumerable<string[]> GetCsvData()
+		private IEnumerable<List<string>> GetCsvData()
 		{
-			var row = new string[nColumns];
-			for(int i = nColumns; i < table.Children.Count; i += nColumns) // Don't start at 0: skip headers
+			const int nValues = nColumns - 1;
+			var row = new List<string>(nValues);
+			for(int i = nColumns; // Don't start at 0: skip headers
+				i < table.Children.Count;
+				i += nColumns, row.Clear() )
 			{
 				for(int c = 0; c < nColumns; c++)
 				{
-					SetCsvValue(row, c, (table.Children[i + c] as Label).Text);
+					if(iColPrice == c) continue; // price = flow/shares, displayed for info
+			
+					var text = (table.Children[i + c] as Label).Text;
+
+					if(iColShares == c)
+						row.Add(text.ReverseFormatShares());
+					else
+						row.Add(text);
 				}
+				Debug.Assert(nValues == row.Count);
 				yield return row;
 			}
 		}
-
-		private static void SetCsvValue(string[] row, int icol, string text)
-		{
-			if(iColPrice == icol)
-				return; // skip, price = flow/shares, displayed for info
-			
-			if(iColShares == icol)
-				row[icol] = text.ReverseFormatShares();
-			else
-				row[icol] = text;
-		}
-
 		private async Task ImportCsvFile()
 		{
 			var file = await FilePicker.PickAsync();
@@ -242,13 +241,41 @@ namespace JP.InvestCalc
 				return;
 			}
 			if(n < 1)
-				await this.DisplayError("No rows found in file " + file.FileName);
+				await DisplayAlert(null, $"No rows found in file{Environment.NewLine}{file.FileName}", "OK");
 			else
 			{
 				HasChanged = true;
 				await DisplayAlert(null, n + " operations imported.", "OK");
 				await Close();
 			}
+		}
+
+		private async Task PromptCsvOptionConfig()
+		{
+			string separator = await DisplayPromptAsync("CSV", "Enter separator:");
+
+			if(null == separator) return;
+
+			if(0 == separator.Length)
+			{
+				await DisplayAlert(null, "Separator can't be empty.", "OK");
+				return;
+			}
+			await SetCsvSeparator(separator);
+		}
+
+		private static string GetCsvSeparator()
+		{
+			if(Application.Current.Properties.TryGetValue("CsvSeparator", out object sep))
+				return sep as string;
+			else
+				return Config.DefaultCsvSeparator;
+		}
+		private async Task SetCsvSeparator(string separator)
+		{
+			this.csv = new CsvProcessor(separator);
+			Application.Current.Properties["CsvSeparator"] = separator;
+			await Application.Current.SavePropertiesAsync();
 		}
 
 		#endregion
