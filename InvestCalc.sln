@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InvestCalc_mobile", "JP.Inv
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JP.SQLite", "..\libs_NET\JP.SQLite\JP.SQLite\JP.SQLite.csproj", "{E7A52FC2-F5C5-427F-B2B9-16D122127A3A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JP.Maths", "..\libs_NET\JP.Maths\JP.Maths.csproj", "{68F43023-CD7D-4159-9353-9D347AC6A784}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JP.Maths", "..\libs_NET\JP.Maths\JP.Maths\JP.Maths.csproj", "{68F43023-CD7D-4159-9353-9D347AC6A784}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InvestCalc_model", "JP.InvestCalc_Model\InvestCalc_model.csproj", "{DCE162D4-98F8-4E96-A454-D3BE7DD145C3}"
 EndProject
