@@ -18,7 +18,9 @@ namespace JP.InvestCalc
 			InitializeComponent();
 			table.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
 			colStock.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
-			colReturn.DefaultCellStyle.Format = "P" + Config.PrecisionPerCent;
+			colValue.DefaultCellStyle.Format =
+			colGain.DefaultCellStyle.Format = "N2";
+			colReturn.DefaultCellStyle.Format = "P2";
 
 			UpdateTime();
 			FillTable();
@@ -38,33 +40,41 @@ namespace JP.InvestCalc
 			SelectionChanged(null, null);
 		}
 
-		void PortfolioView.AddStock(string name, double shares, double? returnPer1Yearly)
+		void PortfolioView.AddStock(string name, double shares,
+			(double NetGain, double YearlyPer1)? values)
 		{
-			table.Rows.Add(name, shares, null, null,
-				returnPer1Yearly.HasValue ? (object)returnPer1Yearly.Value : null);
+			if(values.HasValue)
+				table.Rows.Add(name, shares, null, null, values.Value.NetGain, values.Value.YearlyPer1);
+			else
+				table.Rows.Add(name, shares, null, null, null, null);
 
 			txtReturnAvg.Text = null;
 		}
 
-		void PortfolioView.SetStockFigures(Stock stk, double? returnPer1Yearly)
+		void PortfolioView.SetStockFigures(Stock stk,
+			(double NetGain, double YearlyPer1)? values)
 		{
 			var irow = GetRow(stk.Name);
 			GetCell(irow, colShares).Value = stk.Shares;
 			if(stk.Price.HasValue)
 			{
 				GetCell(irow, colPrice).Value = stk.Price.Value;
-				GetCell(irow, colValue).Value = Math.Round(stk.Price.Value * stk.Shares, 2);
+				GetCell(irow, colValue).Value = stk.Price.Value * stk.Shares;
 			}
 			else
 			{
 				GetCell(irow, colPrice).Value =
 				GetCell(irow, colValue).Value = null;
 			}
-			if(returnPer1Yearly.HasValue)
-				GetCell(irow, colReturn).Value = returnPer1Yearly.Value;
+			if(values.HasValue)
+			{
+				GetCell(irow, colGain  ).Value = values.Value.NetGain;
+				GetCell(irow, colReturn).Value = values.Value.YearlyPer1;
+			}
 			else
+			{
 				GetCell(irow, colReturn).Value = null;
-
+			}
 			TryCalcReturnAvg(table.Rows);
 		}
 
@@ -95,10 +105,13 @@ namespace JP.InvestCalc
 
 		private void ValidatingInput(object sender, DataGridViewCellValidatingEventArgs ea)
 		{
-			if(ea.ColumnIndex != colPrice.Index) return;
+			int irow = ea.RowIndex;
+			int icol = ea.ColumnIndex;
+
+			if(icol != colPrice.Index) return;
 
 			var priceInput = (string)ea.FormattedValue;
-			var priceCell = GetCell(ea.RowIndex, colPrice);
+			var priceCell = GetCell(irow, colPrice);
 
 			if(string.IsNullOrEmpty(priceInput))
 			{
@@ -107,12 +120,15 @@ namespace JP.InvestCalc
 			else if(double.TryParse(priceInput, out var price) &&
 				ValidatePrice(price))
 			{
-				table[ea.ColumnIndex, ea.RowIndex].ToolTipText = null; // clear possible error messages from previous input
+				table[icol, irow].ToolTipText = null; // clear possible error messages from previous input
 				priceCell.Value = price;
-				var shares = (double)GetCell(ea.RowIndex, colShares).Value;
-				GetCell(ea.RowIndex, colValue).Value = Math.Round(price * shares, 2);
-				var stockName = (string)GetCell(ea.RowIndex, colStock).Value;
-				GetCell(ea.RowIndex, colReturn).Value = Model.Calculator.CalcReturn(stockName, shares, price);
+				var shares = (double)GetCell(irow, colShares).Value;
+				GetCell(irow, colValue).Value = price * shares;
+				var stockName = (string)GetCell(irow, colStock).Value;
+
+				var (gain, yearly) = Model.Calculator.CalcReturn(stockName, shares, price);
+				GetCell(irow, colGain).Value = gain;
+				GetCell(irow, colReturn).Value = yearly;
 			}
 			else ea.Cancel = true;
 
@@ -192,10 +208,9 @@ namespace JP.InvestCalc
 			int multi = 0;
 			for(int i = 0; i < table.Rows.Count; i++)
 			{
-				var row = table.Rows[i];
 				stockNames[i] = (string)GetCell(i, colStock).Value;
 
-				if(selected[i] = row.Selected)
+				if(selected[i] = table.Rows[i].Selected)
 					++multi;
 			}
 

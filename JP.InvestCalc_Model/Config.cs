@@ -11,7 +11,5 @@ namespace JP.InvestCalc
 			Environment.SpecialFolder.MyDocuments );
 
 		public const string DefaultCsvSeparator = "\t";
-
-		public const byte PrecisionPerCent = 2;
 	}
 }

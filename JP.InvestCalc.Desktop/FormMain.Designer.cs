@@ -37,11 +37,6 @@
 			this.lblReturnSelected = new System.Windows.Forms.Label();
 			this.lblReturnAvg = new System.Windows.Forms.Label();
 			this.table = new System.Windows.Forms.DataGridView();
-			this.colStock = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.colShares = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.colPrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.colValue = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.colReturn = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.mnuOperate = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.mnuBuy = new System.Windows.Forms.ToolStripMenuItem();
 			this.mnuSell = new System.Windows.Forms.ToolStripMenuItem();
@@ -57,6 +52,12 @@
 			this.lblValueSelected = new System.Windows.Forms.Label();
 			this.lblValueTotal = new System.Windows.Forms.Label();
 			this.pnl = new System.Windows.Forms.Panel();
+			this.colStock = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.colShares = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.colPrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.colValue = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.colGain = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.colReturn = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
 			toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
 			this.pnlTab.SuspendLayout();
@@ -69,6 +70,11 @@
 			// 
 			toolStripSeparator1.Name = "toolStripSeparator1";
 			toolStripSeparator1.Size = new System.Drawing.Size(156, 6);
+			// 
+			// toolStripSeparator2
+			// 
+			toolStripSeparator2.Name = "toolStripSeparator2";
+			toolStripSeparator2.Size = new System.Drawing.Size(156, 6);
 			// 
 			// pnlTab
 			// 
@@ -154,6 +160,7 @@
             this.colShares,
             this.colPrice,
             this.colValue,
+            this.colGain,
             this.colReturn});
 			this.pnlTab.SetColumnSpan(this.table, 4);
 			this.table.ContextMenuStrip = this.mnuOperate;
@@ -167,40 +174,6 @@
 			this.table.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
 			this.table.Size = new System.Drawing.Size(554, 339);
 			this.table.TabIndex = 1;
-			// 
-			// colStock
-			// 
-			this.colStock.HeaderText = "Stock";
-			this.colStock.MinimumWidth = 6;
-			this.colStock.Name = "colStock";
-			this.colStock.ReadOnly = true;
-			// 
-			// colShares
-			// 
-			this.colShares.HeaderText = "Shares";
-			this.colShares.MinimumWidth = 6;
-			this.colShares.Name = "colShares";
-			this.colShares.ReadOnly = true;
-			// 
-			// colPrice
-			// 
-			this.colPrice.HeaderText = "Price";
-			this.colPrice.MinimumWidth = 6;
-			this.colPrice.Name = "colPrice";
-			// 
-			// colValue
-			// 
-			this.colValue.HeaderText = "Value";
-			this.colValue.MinimumWidth = 6;
-			this.colValue.Name = "colValue";
-			this.colValue.ReadOnly = true;
-			// 
-			// colReturn
-			// 
-			this.colReturn.HeaderText = "Yearly";
-			this.colReturn.MinimumWidth = 6;
-			this.colReturn.Name = "colReturn";
-			this.colReturn.ReadOnly = true;
 			// 
 			// mnuOperate
 			// 
@@ -249,11 +222,6 @@
 			this.mnuHistory.Name = "mnuHistory";
 			this.mnuHistory.Size = new System.Drawing.Size(159, 28);
 			this.mnuHistory.Text = "History";
-			// 
-			// toolStripSeparator2
-			// 
-			toolStripSeparator2.Name = "toolStripSeparator2";
-			toolStripSeparator2.Size = new System.Drawing.Size(156, 6);
 			// 
 			// mnuData
 			// 
@@ -338,6 +306,47 @@
 			this.pnl.Size = new System.Drawing.Size(582, 453);
 			this.pnl.TabIndex = 0;
 			// 
+			// colStock
+			// 
+			this.colStock.HeaderText = "Stock";
+			this.colStock.MinimumWidth = 6;
+			this.colStock.Name = "colStock";
+			this.colStock.ReadOnly = true;
+			// 
+			// colShares
+			// 
+			this.colShares.HeaderText = "Shares";
+			this.colShares.MinimumWidth = 6;
+			this.colShares.Name = "colShares";
+			this.colShares.ReadOnly = true;
+			// 
+			// colPrice
+			// 
+			this.colPrice.HeaderText = "Price";
+			this.colPrice.MinimumWidth = 6;
+			this.colPrice.Name = "colPrice";
+			// 
+			// colValue
+			// 
+			this.colValue.HeaderText = "Value";
+			this.colValue.MinimumWidth = 6;
+			this.colValue.Name = "colValue";
+			this.colValue.ReadOnly = true;
+			// 
+			// colGain
+			// 
+			this.colGain.HeaderText = "Gain";
+			this.colGain.MinimumWidth = 6;
+			this.colGain.Name = "colGain";
+			this.colGain.ReadOnly = true;
+			// 
+			// colReturn
+			// 
+			this.colReturn.HeaderText = "Yearly";
+			this.colReturn.MinimumWidth = 6;
+			this.colReturn.Name = "colReturn";
+			this.colReturn.ReadOnly = true;
+			// 
 			// FormMain
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 20F);
@@ -378,15 +387,16 @@
 		private System.Windows.Forms.ContextMenuStrip mnuOperate;
 		private System.Windows.Forms.Label lblValueSelected;
 		private System.Windows.Forms.Label lblValueTotal;
-		private System.Windows.Forms.DataGridViewTextBoxColumn colStock;
-		private System.Windows.Forms.DataGridViewTextBoxColumn colShares;
-		private System.Windows.Forms.DataGridViewTextBoxColumn colPrice;
-		private System.Windows.Forms.DataGridViewTextBoxColumn colValue;
-		private System.Windows.Forms.DataGridViewTextBoxColumn colReturn;
 		private System.Windows.Forms.ToolStripMenuItem mnuHistory;
 		private System.Windows.Forms.ToolStripMenuItem mnuData;
 		private System.Windows.Forms.ToolStripMenuItem mnuExport;
 		private System.Windows.Forms.ToolStripMenuItem mnuImport;
+		private System.Windows.Forms.DataGridViewTextBoxColumn colStock;
+		private System.Windows.Forms.DataGridViewTextBoxColumn colShares;
+		private System.Windows.Forms.DataGridViewTextBoxColumn colPrice;
+		private System.Windows.Forms.DataGridViewTextBoxColumn colValue;
+		private System.Windows.Forms.DataGridViewTextBoxColumn colGain;
+		private System.Windows.Forms.DataGridViewTextBoxColumn colReturn;
 	}
 }
 

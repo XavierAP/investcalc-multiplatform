@@ -199,7 +199,7 @@ namespace JP.InvestCalc
 			stockIndex.Add(name, fields);
 		}
 
-		void PortfolioView.SetStockFigures(Stock stk, double? returnPer1Yearly)
+		void PortfolioView.SetStockFigures(Stock stk, (double NetGain, double YearlyPer1)? values)
 		{
 			var fields = stockIndex[stk.Name];
 			fields.Shares.Text = stk.Shares.FormatShares();
@@ -213,8 +213,8 @@ namespace JP.InvestCalc
 				fields.Price.Text = null;
 				fields.TotalValue.Text = Format.ValueOnUnknownPrice(stk.Shares);
 			}
-			if(returnPer1Yearly.HasValue)
-				fields.Return.Text = returnPer1Yearly.Value.FormatPerCent();
+			if(values.HasValue)
+				fields.Return.Text = values.Value.YearlyPer1.FormatPerCent();
 			else
 				fields.Return.Text = null;
 
@@ -285,7 +285,8 @@ namespace JP.InvestCalc
 			if(double.TryParse(fields.Price.Text, out var price))
 			{
 				fields.TotalValue.Text = (price * stk.Shares).FormatMoney();
-				fields.Return.Text = model.Calculator.CalcReturn(stk.Name, stk.Shares, price).FormatPerCent();
+				var (gain, yearly) = model.Calculator.CalcReturn(stk.Name, stk.Shares, price);
+				fields.Return.Text = yearly.FormatPerCent();
 			}
 			else
 				fields.TotalValue.Text = Format.ValueOnUnknownPrice(stk.Shares);
