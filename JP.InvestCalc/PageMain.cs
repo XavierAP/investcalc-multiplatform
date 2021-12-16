@@ -141,7 +141,8 @@ namespace JP.InvestCalc
 
 		void PortfolioView.InvokeOnUIThread(Action action) => MainThread.BeginInvokeOnMainThread(action);
 
-		void PortfolioView.AddStock(string name, double shares, double? returnPer1Yearly)
+		void PortfolioView.AddStock(string name, double shares,
+			(double NetGain, double YearlyPer1)? values)
 		{
 			var stockGrid = new Grid { ColumnDefinitions = layoutCols };
 			stocksLayout.Children.Add(stockGrid);
@@ -191,15 +192,16 @@ namespace JP.InvestCalc
 			stockGrid.Children.Add(fields.Return = new Label(),
 				++icol, irow);
 
-			if(returnPer1Yearly.HasValue)
-				fields.Return.Text = returnPer1Yearly.Value.FormatPerCent();
+			if(values.HasValue)
+				fields.Return.Text = values.Value.YearlyPer1.FormatPerCent();
 
 			fields.Price.Completed += (s,e) => OnPriceChanged(name);
 
 			stockIndex.Add(name, fields);
 		}
 
-		void PortfolioView.SetStockFigures(Stock stk, (double NetGain, double YearlyPer1)? values)
+		void PortfolioView.SetStockFigures(Stock stk,
+			(double NetGain, double YearlyPer1)? values)
 		{
 			var fields = stockIndex[stk.Name];
 			fields.Shares.Text = stk.Shares.FormatShares();
