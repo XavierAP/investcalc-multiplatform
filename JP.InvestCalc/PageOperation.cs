@@ -19,12 +19,12 @@ namespace JP.InvestCalc
 
 		readonly TextViewUnion stockName;
 		readonly DatePicker date;
-		readonly Entry? shares;
+		readonly Entry shares;
 		readonly Entry
 			totalMoney,
 			comment;
 
-		private PageOperation(Operation op, string? stock,
+		private PageOperation(Operation op, string stock,
 			PortfolioData dataModel, PortfolioView dataView)
 		{
 			operation = op;
@@ -118,7 +118,7 @@ namespace JP.InvestCalc
 
 		#endregion
 
-		private static double ParseNumber(string? text)
+		private static double ParseNumber(string text)
 		{
 			if(string.IsNullOrEmpty(text))
 				return 0;

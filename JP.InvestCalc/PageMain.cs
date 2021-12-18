@@ -30,10 +30,10 @@ namespace JP.InvestCalc
 			btnHistory  = new Button { Text = "History" },
 			btnOptions  = new Button { Text = "Options" };
 
-		private readonly Dictionary<string, (Label Shares, Entry Price, Label TotalValue, Label Return)>
-		stockIndex = new Dictionary<string, (Label Shares, Entry Price, Label TotalValue, Label Return)>();
+		private readonly Dictionary<string, (Label Shares, Label Price, Label Total, Label Gain, Label Yearly)>
+		stockIndex = new Dictionary<string, (Label Shares, Label Price, Label Total, Label Gain, Label Yearly)>();
 		
-		readonly RowDefinition layoutRowHeaderHalf = new RowDefinition { Height = GridLength.Auto };
+		readonly RowDefinition layoutRowHeader = new RowDefinition { Height = GridLength.Auto };
 		readonly RowDefinition layoutRowOther = new RowDefinition { Height = GridLength.Auto };
 		readonly ColumnDefinitionCollection layoutCols;
 
@@ -142,18 +142,16 @@ namespace JP.InvestCalc
 		void PortfolioView.InvokeOnUIThread(Action action) => MainThread.BeginInvokeOnMainThread(action);
 
 		void PortfolioView.AddStock(string name, double shares,
-			(double NetGain, double YearlyPer1)? values)
+			(double NetGain, double YearlyPer1)? info)
 		{
 			var stockGrid = new Grid { ColumnDefinitions = layoutCols };
 			stocksLayout.Children.Add(stockGrid);
-			(Label Shares, Entry Price, Label TotalValue, Label Return) fields;
+			(Label Shares, Label Price, Label Total, Label Gain, Label Yearly) fields;
 			Button btn;
 
-			int irow = 0,
-				icol = 0;
-			// Header: stock name (left 3 cols by 2 rows) and value and number of shares (right col by 1 row each).
-			stockGrid.RowDefinitions.Add(layoutRowHeaderHalf);
-			stockGrid.RowDefinitions.Add(layoutRowHeaderHalf);
+			int irow = 0;
+
+			stockGrid.RowDefinitions.Add(layoutRowHeader);
 			stockGrid.Children.Add(btn = new Button
 			{
 				Text = name,
@@ -162,65 +160,67 @@ namespace JP.InvestCalc
 				BorderColor = Format.LineColor,
 				BorderWidth = 1,
 				CornerRadius = 10,
-			}, 0, icol = 3, irow, irow + 2);
-			stockGrid.Children.Add(fields.TotalValue = new Label
-			{
-				Text = Format.ValueOnUnknownPrice(shares),
-				HorizontalTextAlignment = TextAlignment.End,
-				BackgroundColor = Format.FillColor,
-			}, icol, irow);
-			stockGrid.Children.Add(fields.Shares = new Label
-			{
-				Text = shares.FormatShares(),
-				HorizontalTextAlignment = TextAlignment.End,
-				BackgroundColor = Format.FillColor,
-			}, icol, ++icol, ++irow, ++irow);
-
+			}, 0, 4, irow, ++irow);
 			btn.Clicked += (s, e) => PromptStockActions(name);
 
-			icol = 0;
-			// Left column: price.
+			const int
+				left = 0,
+				right = left + 2;
+			
 			stockGrid.RowDefinitions.Add(layoutRowOther);
-			stockGrid.Children.Add(new Label { Text = "Price:", HorizontalTextAlignment = TextAlignment.End },
-				icol, ++icol, irow, irow + 1);
-			stockGrid.Children.Add(fields.Price = new Entry { Keyboard = Keyboard.Numeric },
-				icol, ++icol, irow, irow + 1);
+			fields.Shares = AddCell("Shares:", stockGrid, left , irow);
+			fields.Gain   = AddCell("Gain:"  , stockGrid, right, irow);
+			stockGrid.RowDefinitions.Add(layoutRowOther);
+			fields.Price  = AddCell("Price:" , stockGrid, left , ++irow);
+			fields.Yearly = AddCell("Return:", stockGrid, right, irow);
+			stockGrid.RowDefinitions.Add(layoutRowOther);
+			fields.Total  = AddCell("Value:" , stockGrid, left , ++irow);
 
-			// Right column: yearly return.
-			stockGrid.Children.Add(new Label { Text = "Yearly:", HorizontalTextAlignment = TextAlignment.End },
-				icol, irow);
-			stockGrid.Children.Add(fields.Return = new Label(),
-				++icol, irow);
-
-			if(values.HasValue)
-				fields.Return.Text = values.Value.YearlyPer1.FormatPerCent();
-
-			fields.Price.Completed += (s,e) => OnPriceChanged(name);
-
+			fields.Shares.Text = shares.FormatShares();
+			if(info.HasValue)
+			{
+				fields.Gain  .Text = info.Value.NetGain.FormatMoneyPlusMinus();
+				fields.Yearly.Text = info.Value.YearlyPer1.FormatPerCent();
+			}
 			stockIndex.Add(name, fields);
 		}
 
 		void PortfolioView.SetStockFigures(Stock stk,
-			(double NetGain, double YearlyPer1)? values)
+			(double NetGain, double YearlyPer1)? info)
 		{
 			var fields = stockIndex[stk.Name];
 			fields.Shares.Text = stk.Shares.FormatShares();
 			if(stk.Price.HasValue)
 			{
-				fields.Price.Text = stk.Price.ToString();
-				fields.TotalValue.Text = (stk.Price * stk.Shares).Value.FormatMoney();
+				fields.Price.Text = stk.Price.Value.FormatMoneyPositive();
+				fields.Total.Text = (stk.Price * stk.Shares).Value.FormatMoneyPositive();
 			}
 			else
 			{
-				fields.Price.Text = null;
-				fields.TotalValue.Text = Format.ValueOnUnknownPrice(stk.Shares);
+				fields.Price.Text =
+				fields.Total.Text = null;
 			}
-			if(values.HasValue)
-				fields.Return.Text = values.Value.YearlyPer1.FormatPerCent();
+			if(info.HasValue)
+			{
+				fields.Gain.Text = info.Value.NetGain.FormatMoneyPlusMinus();
+				fields.Yearly.Text = info.Value.YearlyPer1.FormatPerCent();
+			}
 			else
-				fields.Return.Text = null;
-
+			{
+				fields.Gain.Text =
+				fields.Yearly.Text = null;
+			}
 			TryCalcReturnAvg();
+		}
+
+		private static Label AddCell(string label, Grid stockGrid, int icol, int irow)
+		{
+			Label ans;
+			stockGrid.Children.Add(new Label { Text = label, HorizontalTextAlignment = TextAlignment.End },
+				icol, irow);
+			stockGrid.Children.Add(ans = new Label(),
+				icol+1, irow);
+			return ans;
 		}
 
 		
@@ -279,19 +279,24 @@ namespace JP.InvestCalc
 		}
 
 
-		private void OnPriceChanged(string stockName)
+		private async Task TrySetPrice(string stockName, string priceInput)
 		{
-			var fields = stockIndex[stockName];
-
-			var stk = model.Portfolio[stockName];
-			if(double.TryParse(fields.Price.Text, out var price))
+			bool isInputValid = double.TryParse(priceInput, out var price);
+			if(!isInputValid || price < 0)
 			{
-				fields.TotalValue.Text = (price * stk.Shares).FormatMoney();
-				var (gain, yearly) = model.Calculator.CalcReturn(stk.Name, stk.Shares, price);
-				fields.Return.Text = yearly.FormatPerCent();
+				await DisplayAlert(null, "Invalid input", "OK");
+				return;
 			}
-			else
-				fields.TotalValue.Text = Format.ValueOnUnknownPrice(stk.Shares);
+			var stk = model.Portfolio[stockName];
+			var total = price * stk.Shares;
+
+			var fields = stockIndex[stockName];
+			fields.Price.Text = price.FormatMoneyPositive();
+			fields.Total.Text = total.FormatMoneyPositive();
+
+			var (gain, yearly) = model.Calculator.CalcReturn(stk.Name, total);
+			fields.Gain.Text = gain.FormatMoneyPlusMinus();
+			fields.Yearly.Text = yearly.FormatPerCent();
 			
 			TryCalcReturnAvg();
 		}
@@ -299,15 +304,16 @@ namespace JP.InvestCalc
 		private void TryCalcReturnAvg()
 		{
 			double total = 0;
-			foreach(var fields in stockIndex.Values)
+			foreach(var stk in model.Portfolio.Values)
 			{
-				if(fields.TotalValue.Text == null)
+				if(stk.IsValueKnown(out var value))
+					total += value;
+				else
 				{
 					averageReturn.Tag.Text =
 					averageReturn.Value.Text = null;
 					return;
 				}
-				total += double.Parse(fields.TotalValue.Text);
 			}
 			averageReturn.Tag.Text = "Average return:";
 			averageReturn.Value.Text = model.Calculator.CalcReturnAvg(GetAllStockNames(), total).FormatPerCent();
@@ -321,27 +327,32 @@ namespace JP.InvestCalc
 				Operation.Dividend.Text,
 				Operation.Cost.Text,
 				"History",
-				"Enter fetch code",
+				"- Enter fetch code",
+				"- or enter price manually",
 				"Edit stock name");
 
 			if(option == "History")
 			{
 				await DisplayHistory(stockName);
 			}
-			else if(option =="Enter fetch code")
+			else if(option =="- Enter fetch code")
 			{
 				string code = await DisplayPromptAsync(stockName, "Enter fetch code");
-				if(null == code)
-					return;
+				if(null == code) return;
 				model.Data.SetFetchCode(stockName, code);
 				RefreshPortfolio();
+			}
+			else if(option == "- or enter price manually")
+			{
+				string price = await DisplayPromptAsync(stockName, "Enter price", keyboard: Keyboard.Numeric);
+				if(null == price) return;
+				await TrySetPrice(stockName, price);
 			}
 			else if(option == "Edit stock name")
 			{
 				string newName = await DisplayPromptAsync(stockName, "Enter a new name",
 					initialValue: stockName);
-				if(string.IsNullOrWhiteSpace(newName))
-					return;
+				if(string.IsNullOrWhiteSpace(newName)) return;
 				model.Data.SetStockName(stockName, newName);
 				RefreshPortfolio();
 			}

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -41,10 +40,10 @@ namespace JP.InvestCalc
 		}
 
 		void PortfolioView.AddStock(string name, double shares,
-			(double NetGain, double YearlyPer1)? values)
+			(double NetGain, double YearlyPer1)? info)
 		{
-			if(values.HasValue)
-				table.Rows.Add(name, shares, null, null, values.Value.NetGain, values.Value.YearlyPer1);
+			if(info.HasValue)
+				table.Rows.Add(name, shares, null, null, info.Value.NetGain, info.Value.YearlyPer1);
 			else
 				table.Rows.Add(name, shares, null, null, null, null);
 
@@ -52,7 +51,7 @@ namespace JP.InvestCalc
 		}
 
 		void PortfolioView.SetStockFigures(Stock stk,
-			(double NetGain, double YearlyPer1)? values)
+			(double NetGain, double YearlyPer1)? info)
 		{
 			var irow = GetRow(stk.Name);
 			GetCell(irow, colShares).Value = stk.Shares;
@@ -66,10 +65,10 @@ namespace JP.InvestCalc
 				GetCell(irow, colPrice).Value =
 				GetCell(irow, colValue).Value = null;
 			}
-			if(values.HasValue)
+			if(info.HasValue)
 			{
-				GetCell(irow, colGain  ).Value = values.Value.NetGain;
-				GetCell(irow, colReturn).Value = values.Value.YearlyPer1;
+				GetCell(irow, colGain  ).Value = info.Value.NetGain;
+				GetCell(irow, colReturn).Value = info.Value.YearlyPer1;
 			}
 			else
 			{
@@ -123,10 +122,11 @@ namespace JP.InvestCalc
 				table[icol, irow].ToolTipText = null; // clear possible error messages from previous input
 				priceCell.Value = price;
 				var shares = (double)GetCell(irow, colShares).Value;
-				GetCell(irow, colValue).Value = price * shares;
+				var total = shares * price;
+				GetCell(irow, colValue).Value = total;
 				var stockName = (string)GetCell(irow, colStock).Value;
 
-				var (gain, yearly) = Model.Calculator.CalcReturn(stockName, shares, price);
+				var (gain, yearly) = Model.Calculator.CalcReturn(stockName, total);
 				GetCell(irow, colGain).Value = gain;
 				GetCell(irow, colReturn).Value = yearly;
 			}

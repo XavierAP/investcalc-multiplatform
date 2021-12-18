@@ -16,5 +16,24 @@ namespace JP.InvestCalc
 			this.Name = name;
 			this.Shares = shares;
 		}
+
+		public bool IsValueKnown(out double totalValue)
+		{
+			if(Shares == 0)
+			{
+				totalValue = 0;
+				return true;
+			}
+			else if(Price.HasValue)
+			{
+				totalValue = Shares * Price.Value;
+				return true;
+			}
+			else
+			{
+				totalValue = double.NaN;
+				return false;
+			}
+		}
 	}
 }

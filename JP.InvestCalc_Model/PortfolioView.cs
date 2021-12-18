@@ -7,9 +7,9 @@ namespace JP.InvestCalc
 		void InvokeOnUIThread(Action action);
 
 		void AddStock(string name, double shares,
-			(double NetGain, double YearlyPer1)? valueInfo);
+			(double NetGain, double YearlyPer1)? info);
 
 		void SetStockFigures(Stock stk,
-			(double NetGain, double YearlyPer1)? valueInfo);
+			(double NetGain, double YearlyPer1)? info);
 	}
 }

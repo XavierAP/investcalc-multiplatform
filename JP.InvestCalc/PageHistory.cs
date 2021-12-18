@@ -105,8 +105,8 @@ namespace JP.InvestCalc
 				row.Date.ToShortDateString(),
 				row.StockName,
 				row.Shares.FormatShares(),
-				row.Flow.FormatMoney(),
-				row.PriceAvg.FormatMoney(),
+				row.Flow.FormatMoneyPlusMinus(),
+				row.PriceAvg.FormatMoneyPositive(),
 				row.Comment);
 
 			databaseIds.Add(row.DatabaseId);
@@ -214,13 +214,7 @@ namespace JP.InvestCalc
 				for(int c = 0; c < nColumns; c++)
 				{
 					if(iColPrice == c) continue; // price = flow/shares, displayed for info
-			
-					var text = (table.Children[i + c] as Label).Text;
-
-					if(iColShares == c)
-						row.Add(text.ReverseFormatShares());
-					else
-						row.Add(text);
+					row.Add((table.Children[i + c] as Label).Text);
 				}
 				Debug.Assert(nValues == row.Count);
 				yield return row;

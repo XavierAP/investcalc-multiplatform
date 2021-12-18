@@ -13,23 +13,19 @@ namespace JP.InvestCalc
 		internal Calculator(Database database) => this.database = database;
 
 		public (double NetGain, double YearlyPer1)
-		CalcReturn(string name, double shares, double price)
+		CalcReturn(string name, double totalValue)
 		{
 			var flows = database.GetFlows(name);
-			var currentValue = shares * price;
-			var netGain = AddUpCash(flows) + currentValue;
-			var yearly = Money.SolveRateInvest(flows,
-				(currentValue, DateTime.Now.Date), PrecisionPer1);
+			var netGain = AddUpCash(flows) + totalValue;
+			var yearly = Money.SolveRateInvest(flows, (totalValue, DateTime.Now.Date), PrecisionPer1);
 			return (netGain, yearly);
 		}
 
 		internal (double NetGain, double YearlyPer1)?
 		CalcReturn(Stock stk)
 		{
-			if(stk.Price.HasValue)
-				return CalcReturn(stk.Name, stk.Shares, stk.Price.Value);
-			else if(stk.Shares == 0)
-				return CalcReturn(stk.Name, 0, 0);
+			if(stk.IsValueKnown(out var totalValue))
+				return CalcReturn(stk.Name, totalValue);
 			else
 				return null;
 		}
