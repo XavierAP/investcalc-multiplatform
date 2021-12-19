@@ -215,16 +215,14 @@ namespace JP.InvestCalc
 
 		private static Label AddCell(string caption, Grid stockGrid, int icol, int irow)
 		{
-			Label ans;
 			stockGrid.Children.Add(new Label
 			{
 				Text = caption,
 				HorizontalTextAlignment = TextAlignment.End,
-			}.SetFontSizeMediumSmall(),
-				icol, irow);
+			}.SetFontSizeMediumSmall(), icol, irow);
 
-			stockGrid.Children.Add(ans = new Label().SetFontSizeMediumSmall(),
-				icol + 1, irow);
+			var ans = new Label().SetFontSizeMediumSmall();
+			stockGrid.Children.Add(ans, icol + 1, irow);
 
 			return ans;
 		}
