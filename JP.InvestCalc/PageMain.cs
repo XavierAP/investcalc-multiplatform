@@ -37,6 +37,8 @@ namespace JP.InvestCalc
 		readonly RowDefinition layoutRowOther = new RowDefinition { Height = GridLength.Auto };
 		readonly ColumnDefinitionCollection layoutCols;
 
+		readonly double FontSize = GetFontSize();
+
 		public PageMain()
 		{
 			ExperimentalFeatures.Enable("ShareFileRequest_Experimental");
@@ -55,6 +57,9 @@ namespace JP.InvestCalc
 			PrepareLayouts();
 			SetButtonEvents();
 			RefreshPortfolio();
+
+			averageReturn.Tag.FontSize =
+			averageReturn.Value.FontSize = FontSize;
 		}
 
 		private static void ConstructLayouts(
@@ -213,14 +218,22 @@ namespace JP.InvestCalc
 			TryCalcReturnAvg();
 		}
 
-		private static Label AddCell(string label, Grid stockGrid, int icol, int irow)
+		private Label AddCell(string caption, Grid stockGrid, int icol, int irow)
 		{
-			Label ans;
-			stockGrid.Children.Add(new Label { Text = label, HorizontalTextAlignment = TextAlignment.End },
-				icol, irow);
-			stockGrid.Children.Add(ans = new Label(),
-				icol+1, irow);
-			return ans;
+			Label key, value;
+			stockGrid.Children.Add(key = new Label
+			{
+				Text = caption,
+				HorizontalTextAlignment = TextAlignment.End,
+			}, icol, irow);
+
+			stockGrid.Children.Add(value = new Label(),
+				icol + 1, irow);
+
+			key.FontSize =
+			value.FontSize = FontSize;
+
+			return value;
 		}
 
 		
@@ -437,5 +450,10 @@ namespace JP.InvestCalc
 			Config.GetDataFolder(), "api-license.txt");
 
 		private string[] GetAllStockNames() => stockIndex.Keys.ToArray();
+
+
+		private static double GetFontSize() => 0.5 * (
+			Device.GetNamedSize(NamedSize.Small, typeof(Label)) +
+			Device.GetNamedSize(NamedSize.Medium, typeof(Label)) );
 	}
 }
