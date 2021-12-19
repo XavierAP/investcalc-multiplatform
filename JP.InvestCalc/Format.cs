@@ -11,6 +11,6 @@ namespace JP.InvestCalc
 		public static string FormatShares(this double value) => value == 0 ? null : value.ToString("#,#.##");
 		public static string FormatMoneyPositive(this double value) => value == 0 ? null : value.ToString("#,#.00");
 		public static string FormatMoneyPlusMinus(this double value) => value.ToString("+#,#.00;-#,#.00;0");
-		public static string FormatPerCent(this double per1) => per1.ToString("+#,#.## %;-#,#.## %;0 %");
+		public static string FormatPerCent(this double per1) => per1.ToString("+#,#.##%;-#,#.##%;0%");
 	}
 }
