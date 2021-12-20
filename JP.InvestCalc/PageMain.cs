@@ -172,7 +172,7 @@ namespace JP.InvestCalc
 			fields.Gain   = AddCell("Gain:"  , stockGrid, right, irow);
 			stockGrid.RowDefinitions.Add(layoutRowOther);
 			fields.Price  = AddCell("Price:" , stockGrid, left , ++irow);
-			fields.Yearly = AddCell("Return:", stockGrid, right, irow);
+			fields.Yearly = AddCell("Yearly:", stockGrid, right, irow);
 			stockGrid.RowDefinitions.Add(layoutRowOther);
 			fields.Total  = AddCell("Value:" , stockGrid, left , ++irow);
 

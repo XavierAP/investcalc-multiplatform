@@ -135,7 +135,7 @@
 			this.lblReturnSelected.Name = "lblReturnSelected";
 			this.lblReturnSelected.Size = new System.Drawing.Size(142, 20);
 			this.lblReturnSelected.TabIndex = 6;
-			this.lblReturnSelected.Text = "Return of selcted:";
+			this.lblReturnSelected.Text = "Return of selected:";
 			// 
 			// lblReturnAvg
 			// 
