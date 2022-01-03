@@ -183,7 +183,10 @@ namespace JP.InvestCalc
 			{
 				case "Export": await ExportCsvFile(); break;
 				case "Import": await ImportCsvFile(); break;
-				case "Configure": await PromptCsvOptionConfig(); break;
+
+				case "Configure":
+					await this.PromptAndAct(SetCsvSeparator, "CSV", "Enter separator:");
+					break;
 
 				case "Cancel":
 				default:
@@ -244,20 +247,6 @@ namespace JP.InvestCalc
 			}
 		}
 
-		private async Task PromptCsvOptionConfig()
-		{
-			string separator = await DisplayPromptAsync("CSV", "Enter separator:");
-
-			if(null == separator) return;
-
-			if(0 == separator.Length)
-			{
-				await DisplayAlert(null, "Separator can't be empty.", "OK");
-				return;
-			}
-			await SetCsvSeparator(separator);
-		}
-
 		private static string GetCsvSeparator()
 		{
 			if(Application.Current.Properties.TryGetValue("CsvSeparator", out object sep))
@@ -267,6 +256,11 @@ namespace JP.InvestCalc
 		}
 		private async Task SetCsvSeparator(string separator)
 		{
+			if(0 == separator.Length)
+			{
+				await DisplayAlert(null, "Separator can't be empty.", "OK");
+				return;
+			}
 			this.csv = new CsvProcessor(separator);
 			Application.Current.Properties["CsvSeparator"] = separator;
 			await Application.Current.SavePropertiesAsync();

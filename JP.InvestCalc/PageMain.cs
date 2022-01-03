@@ -341,24 +341,27 @@ namespace JP.InvestCalc
 			}
 			else if(option =="- Enter fetch code")
 			{
-				string code = await DisplayPromptAsync(stockName, "Enter fetch code");
-				if(null == code) return;
-				model.Data.SetFetchCode(stockName, code);
-				RefreshPortfolio();
+				await this.PromptAndAct(SetFetchCode, stockName, "Enter fetch code");
+				async Task SetFetchCode(string code)
+				{
+					model.Data.SetFetchCode(stockName, code);
+					RefreshPortfolio();
+				}
 			}
 			else if(option == "- or enter price manually")
 			{
-				string price = await DisplayPromptAsync(stockName, "Enter price", keyboard: Keyboard.Numeric);
-				if(null == price) return;
-				await TrySetPrice(stockName, price);
+				await this.PromptAndAct(SetPrice, stockName, "Enter price", keyboard: Keyboard.Numeric);
+				async Task SetPrice(string price) => await TrySetPrice(stockName, price);
 			}
 			else if(option == "Edit stock name")
 			{
-				string newName = await DisplayPromptAsync(stockName, "Enter a new name",
-					initialValue: stockName);
-				if(string.IsNullOrWhiteSpace(newName)) return;
-				model.Data.SetStockName(stockName, newName);
-				RefreshPortfolio();
+				await this.PromptAndAct(SetStockName, stockName, "Enter a new name", initialValue: stockName);
+				async Task SetStockName(string newName)
+				{
+					if(string.IsNullOrWhiteSpace(newName)) return;
+					model.Data.SetStockName(stockName, newName);
+					RefreshPortfolio();
+				}
 			}
 			else
 			{
@@ -383,15 +386,19 @@ namespace JP.InvestCalc
 		private async void PromptOptions(object sender, EventArgs ea)
 		{
 			var option = await DisplayActionSheet("Options", "Cancel", null,
-				"Search fetch codes",
 				"Export data file",
 				"Import data file",
+				"Search fetch codes",
 				"Price lookup license");
 			switch(option)
 			{
 				case "Export data file": await ExportDataFile(); break;
 				case "Import data file": await ImportDataFile(); break;
-				case "Price lookup license": await PromptLicense(); break;
+
+				case "Price lookup license":
+					await this.PromptAndAct(SetLicense, "API license",
+						"Enter your key from AlphaVantage.co:", initialValue: model.ApiLicenseKey);
+					break;
 
 				case "Cancel":
 				default:
@@ -416,13 +423,8 @@ namespace JP.InvestCalc
 				await this.DisplayError(err);
 		}
 
-		private async Task PromptLicense()
+		private async Task SetLicense(string license)
 		{
-			string license = await DisplayPromptAsync("API license", "Enter your key from AlphaVantage.co:",
-				initialValue: model.ApiLicenseKey);
-
-			if(license == null) return;
-
 			File.WriteAllText(GetAPILicenseFileName(), license);
 			model.ApiLicenseKey = license;
 			RefreshPortfolio();
