@@ -8,10 +8,10 @@ namespace JP.InvestCalc
 		public static readonly Color FillColor       = Color.LightBlue;
 		public static readonly Color LineColor       = Color.Blue;
 		
-		public static string FormatShares(this double value) => value == 0 ? null : value.ToString("#,#.##");
-		public static string FormatMoneyPositive(this double value) => value == 0 ? null : value.ToString("#,#.00");
-		public static string FormatMoneyPlusMinus(this double value) => value.ToString("+#,#.00;-#,#.00;0");
-		public static string FormatPerCent(this double per1) => per1.ToString("+#,#.##%;-#,#.##%;0%");
+		public static string FormatShares(this double value) => value == 0 ? null : value.ToString("#,0.##");
+		public static string FormatMoneyPositive(this double value) => value == 0 ? null : value.ToString("#,0.00");
+		public static string FormatMoneyPlusMinus(this double value) => value.ToString("+#,0.00;-#,0.00;0");
+		public static string FormatPerCent(this double per1) => per1.ToString("+#,0.##%;-#,0.##%;0%");
 
 		public static Label SetFontSizeMediumSmall(this Label lbl)
 		{
