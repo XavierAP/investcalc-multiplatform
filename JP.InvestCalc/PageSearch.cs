@@ -9,7 +9,6 @@ namespace JP.InvestCalc
 	{
 		public PageSearch(string[][] results)
 		{
-			SetColumns(results[0].Length);
 			for(int r = 0; r < results.Length; r++)
 			{
 				var row = results[r];

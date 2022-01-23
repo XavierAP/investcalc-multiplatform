@@ -23,15 +23,17 @@ namespace JP.InvestCalc
 
 		readonly Data dataCache;
 		
+		readonly Button buttonDelete, buttonCsv;
+
 		public bool HasChanged { get; private set; } = false;
 
-		readonly Button buttonDelete, buttonCsv;
+		private bool IsEmpty => RowCount <= 1; // including headers
 
 		public PageHistory(FlowEditor data, params string[] stockNames)
 		{
 			this.dataBase = data;
 
-			SetHeaders("Date", "Stock", "Shares", "Flow", "Price", "Comment");
+			AddHeaders("Date", "Stock", "Shares", "Flow", "Price", "Comment");
 			AddData(dataCache = data.GetFlowDetailsOrdered(stockNames, DateTime.MinValue, DateTime.Now));
 
 			buttonDelete = AddButtonAtBottom("Delete last", DoDelete);
@@ -48,6 +50,19 @@ namespace JP.InvestCalc
 		private void OnOrientationSetOrChanged(Orientation orientation)
 		{
 			buttonDelete.IsVisible = buttonCsv.IsVisible = orientation == Orientation.Portrait;
+		}
+
+		private void AddHeaders(params string[] headers)
+		{
+			AddRow();
+			foreach(var h  in headers)
+			{
+				AddCellToCurrentRow(new Label
+				{
+					Text = h,
+					FontAttributes = FontAttributes.Bold,
+				});
+			}
 		}
 
 		private void AddData(Data data)
