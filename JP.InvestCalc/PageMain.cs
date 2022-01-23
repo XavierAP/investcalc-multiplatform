@@ -395,8 +395,10 @@ namespace JP.InvestCalc
 				case "Export data file": await ExportDataFile(); break;
 				case "Import data file": await ImportDataFile(); break;
 
+				case "Search fetch codes": await SearchStocks(); break;
+
 				case "Price lookup license":
-					await this.PromptAndAct(SetLicense, "API license",
+					await this.PromptAndAct(SetPriceAPILicense, "API license",
 						"Enter your key from AlphaVantage.co:", initialValue: model.ApiLicenseKey);
 					break;
 
@@ -422,14 +424,31 @@ namespace JP.InvestCalc
 			else
 				await this.DisplayError(err);
 		}
+		
 
-		private async Task SetLicense(string license)
+		private async Task SearchStocks()
+		{
+			await this.PromptAndAct(ShowSearchResults, "Search stocks", "Enter search term:");
+			async Task ShowSearchResults(string keyword)
+			{
+				if(string.IsNullOrWhiteSpace(keyword)) return;
+				var results = await new StockSearcher().Search(keyword, model.ApiLicenseKey);
+				if(results.Length == 0)
+				{
+					await DisplayAlert(null, "No results", "OK");
+					return;
+				}
+				await Navigation.PushModalAsync(new PageSearch(results));
+			};
+		}
+
+
+		private async Task SetPriceAPILicense(string license)
 		{
 			File.WriteAllText(GetAPILicenseFileName(), license);
 			model.ApiLicenseKey = license;
 			RefreshPortfolio();
 		}
-
 
 		private static string GetPriceAPILicense()
 		{
