@@ -1,7 +1,6 @@
 # InvestCalc
 Program to keep track of investments and calculate their returns.
-Desktop version complete, mobile apps in progress.
-Both share same back-end source code (.NET and Xamarin).
+Desktop and mobile apps sharing same back-end source code (.NET and Xamarin).
 
 ![Screenshot](https://i.postimg.cc/zGWbYDp2/Invest-Calc.png "Example of main window")
 
