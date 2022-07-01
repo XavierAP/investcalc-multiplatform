@@ -30,8 +30,8 @@ namespace JP.InvestCalc
 			btnHistory  = new Button { Text = "History" },
 			btnOptions  = new Button { Text = "Options" };
 
-		private readonly Dictionary<string, (Label Shares, Label Price, Label Total, Label Gain, Label Yearly)>
-		stockIndex = new Dictionary<string, (Label Shares, Label Price, Label Total, Label Gain, Label Yearly)>();
+		private readonly Dictionary<string, (Label Shares, Label Price, Label Total, Label NetGain, Label GainRatio, Label Yearly)>
+		stockIndex = new Dictionary<string, (Label Shares, Label Price, Label Total, Label NetGain, Label GainRatio, Label Yearly)>();
 		
 		readonly RowDefinition layoutRowHeader = new RowDefinition { Height = GridLength.Auto };
 		readonly RowDefinition layoutRowOther = new RowDefinition { Height = GridLength.Auto };
@@ -142,11 +142,11 @@ namespace JP.InvestCalc
 		void PortfolioView.InvokeOnUIThread(Action action) => MainThread.BeginInvokeOnMainThread(action);
 
 		void PortfolioView.AddStock(string name, double shares,
-			(double NetGain, double YearlyPer1)? info)
+			(double NetGain, double GainRatio, double YearlyPer1)? info)
 		{
 			var stockGrid = new Grid { ColumnDefinitions = layoutCols };
 			stocksLayout.Children.Add(stockGrid);
-			(Label Shares, Label Price, Label Total, Label Gain, Label Yearly) fields;
+			(Label Shares, Label Price, Label Total, Label NetGain, Label GainRatio, Label Yearly) fields;
 			Button btn;
 
 			int irow = 0;
@@ -168,25 +168,27 @@ namespace JP.InvestCalc
 				right = left + 2;
 			
 			stockGrid.RowDefinitions.Add(layoutRowOther);
-			fields.Shares = AddCell("Shares:", stockGrid, left , irow);
-			fields.Gain   = AddCell("Gain:"  , stockGrid, right, irow);
+			fields.Shares    = AddCell("Shares:", stockGrid, left , irow);
+			fields.NetGain   = AddCell("Gain:"  , stockGrid, right, irow);
 			stockGrid.RowDefinitions.Add(layoutRowOther);
-			fields.Price  = AddCell("Price:" , stockGrid, left , ++irow);
-			fields.Yearly = AddCell("Yearly:", stockGrid, right, irow);
+			fields.Price     = AddCell("Price:" , stockGrid, left , ++irow);
+			fields.GainRatio = AddCell("Gain/Invest:", stockGrid, right, irow);
 			stockGrid.RowDefinitions.Add(layoutRowOther);
-			fields.Total  = AddCell("Value:" , stockGrid, left , ++irow);
+			fields.Total     = AddCell("Value:" , stockGrid, left , ++irow);
+			fields.Yearly    = AddCell("Yearly:", stockGrid, right, irow);
 
 			fields.Shares.Text = shares.FormatShares();
 			if(info.HasValue)
 			{
-				fields.Gain  .Text = info.Value.NetGain.FormatMoneyPlusMinus();
+				fields.NetGain.Text = info.Value.NetGain.FormatMoneyPlusMinus();
+				fields.GainRatio.Text = info.Value.GainRatio.FormatPerCent();
 				fields.Yearly.Text = info.Value.YearlyPer1.FormatPerCent();
 			}
 			stockIndex.Add(name, fields);
 		}
 
 		void PortfolioView.SetStockFigures(Stock stk,
-			(double NetGain, double YearlyPer1)? info)
+			(double NetGain, double GainRatio, double YearlyPer1)? info)
 		{
 			var fields = stockIndex[stk.Name];
 			fields.Shares.Text = stk.Shares.FormatShares();
@@ -202,12 +204,14 @@ namespace JP.InvestCalc
 			}
 			if(info.HasValue)
 			{
-				fields.Gain.Text = info.Value.NetGain.FormatMoneyPlusMinus();
+				fields.NetGain.Text = info.Value.NetGain.FormatMoneyPlusMinus();
+				fields.GainRatio.Text = info.Value.GainRatio.FormatPerCent();
 				fields.Yearly.Text = info.Value.YearlyPer1.FormatPerCent();
 			}
 			else
 			{
-				fields.Gain.Text =
+				fields.NetGain.Text =
+				fields.GainRatio.Text =
 				fields.Yearly.Text = null;
 			}
 			TryCalcReturnAvg();
@@ -298,9 +302,10 @@ namespace JP.InvestCalc
 			fields.Price.Text = price.FormatMoneyPositive();
 			fields.Total.Text = total.FormatMoneyPositive();
 
-			var (gain, yearly) = model.Calculator.CalcReturn(stk.Name, total);
-			fields.Gain.Text = gain.FormatMoneyPlusMinus();
-			fields.Yearly.Text = yearly.FormatPerCent();
+			var info = model.Calculator.CalcReturn(stk.Name, total);
+			fields.NetGain.Text = info.NetGain.FormatMoneyPlusMinus();
+			fields.GainRatio.Text = info.GainRatio.FormatPerCent();
+			fields.Yearly.Text = info.YearlyPer1.FormatPerCent();
 			
 			TryCalcReturnAvg();
 		}

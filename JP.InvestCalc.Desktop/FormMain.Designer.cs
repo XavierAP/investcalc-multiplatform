@@ -56,7 +56,8 @@
 			this.colShares = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.colPrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.colValue = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.colGain = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.colNetGain = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.colGainRatio = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.colReturn = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
 			toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
@@ -102,16 +103,16 @@
 			this.pnlTab.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
 			this.pnlTab.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.pnlTab.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.pnlTab.Size = new System.Drawing.Size(562, 433);
+			this.pnlTab.Size = new System.Drawing.Size(760, 433);
 			this.pnlTab.TabIndex = 0;
 			// 
 			// txtReturnSelected
 			// 
 			this.txtReturnSelected.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.txtReturnSelected.Location = new System.Drawing.Point(151, 403);
+			this.txtReturnSelected.Location = new System.Drawing.Point(160, 403);
 			this.txtReturnSelected.Name = "txtReturnSelected";
 			this.txtReturnSelected.ReadOnly = true;
-			this.txtReturnSelected.Size = new System.Drawing.Size(136, 27);
+			this.txtReturnSelected.Size = new System.Drawing.Size(230, 27);
 			this.txtReturnSelected.TabIndex = 7;
 			this.txtReturnSelected.TabStop = false;
 			this.txtReturnSelected.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
@@ -119,10 +120,10 @@
 			// txtReturnAvg
 			// 
 			this.txtReturnAvg.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.txtReturnAvg.Location = new System.Drawing.Point(423, 403);
+			this.txtReturnAvg.Location = new System.Drawing.Point(526, 403);
 			this.txtReturnAvg.Name = "txtReturnAvg";
 			this.txtReturnAvg.ReadOnly = true;
-			this.txtReturnAvg.Size = new System.Drawing.Size(136, 27);
+			this.txtReturnAvg.Size = new System.Drawing.Size(231, 27);
 			this.txtReturnAvg.TabIndex = 9;
 			this.txtReturnAvg.TabStop = false;
 			this.txtReturnAvg.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
@@ -133,7 +134,7 @@
 			this.lblReturnSelected.AutoSize = true;
 			this.lblReturnSelected.Location = new System.Drawing.Point(3, 406);
 			this.lblReturnSelected.Name = "lblReturnSelected";
-			this.lblReturnSelected.Size = new System.Drawing.Size(142, 20);
+			this.lblReturnSelected.Size = new System.Drawing.Size(151, 20);
 			this.lblReturnSelected.TabIndex = 6;
 			this.lblReturnSelected.Text = "Return of selected:";
 			// 
@@ -141,7 +142,7 @@
 			// 
 			this.lblReturnAvg.Anchor = System.Windows.Forms.AnchorStyles.Right;
 			this.lblReturnAvg.AutoSize = true;
-			this.lblReturnAvg.Location = new System.Drawing.Point(293, 406);
+			this.lblReturnAvg.Location = new System.Drawing.Point(396, 406);
 			this.lblReturnAvg.Name = "lblReturnAvg";
 			this.lblReturnAvg.Size = new System.Drawing.Size(124, 20);
 			this.lblReturnAvg.TabIndex = 8;
@@ -160,7 +161,8 @@
             this.colShares,
             this.colPrice,
             this.colValue,
-            this.colGain,
+            this.colNetGain,
+            this.colGainRatio,
             this.colReturn});
 			this.pnlTab.SetColumnSpan(this.table, 4);
 			this.table.ContextMenuStrip = this.mnuOperate;
@@ -172,7 +174,7 @@
 			this.table.RowHeadersWidth = 51;
 			this.table.RowTemplate.Height = 24;
 			this.table.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-			this.table.Size = new System.Drawing.Size(554, 339);
+			this.table.Size = new System.Drawing.Size(752, 339);
 			this.table.TabIndex = 1;
 			// 
 			// mnuOperate
@@ -244,10 +246,10 @@
 			// txtValueSelected
 			// 
 			this.txtValueSelected.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.txtValueSelected.Location = new System.Drawing.Point(151, 370);
+			this.txtValueSelected.Location = new System.Drawing.Point(160, 370);
 			this.txtValueSelected.Name = "txtValueSelected";
 			this.txtValueSelected.ReadOnly = true;
-			this.txtValueSelected.Size = new System.Drawing.Size(136, 27);
+			this.txtValueSelected.Size = new System.Drawing.Size(230, 27);
 			this.txtValueSelected.TabIndex = 3;
 			this.txtValueSelected.TabStop = false;
 			this.txtValueSelected.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
@@ -255,10 +257,10 @@
 			// txtValueTotal
 			// 
 			this.txtValueTotal.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.txtValueTotal.Location = new System.Drawing.Point(423, 370);
+			this.txtValueTotal.Location = new System.Drawing.Point(526, 370);
 			this.txtValueTotal.Name = "txtValueTotal";
 			this.txtValueTotal.ReadOnly = true;
-			this.txtValueTotal.Size = new System.Drawing.Size(136, 27);
+			this.txtValueTotal.Size = new System.Drawing.Size(231, 27);
 			this.txtValueTotal.TabIndex = 5;
 			this.txtValueTotal.TabStop = false;
 			this.txtValueTotal.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
@@ -278,7 +280,7 @@
 			// 
 			this.lblValueSelected.Anchor = System.Windows.Forms.AnchorStyles.Right;
 			this.lblValueSelected.AutoSize = true;
-			this.lblValueSelected.Location = new System.Drawing.Point(21, 373);
+			this.lblValueSelected.Location = new System.Drawing.Point(30, 373);
 			this.lblValueSelected.Name = "lblValueSelected";
 			this.lblValueSelected.Size = new System.Drawing.Size(124, 20);
 			this.lblValueSelected.TabIndex = 2;
@@ -288,7 +290,7 @@
 			// 
 			this.lblValueTotal.Anchor = System.Windows.Forms.AnchorStyles.Right;
 			this.lblValueTotal.AutoSize = true;
-			this.lblValueTotal.Location = new System.Drawing.Point(305, 373);
+			this.lblValueTotal.Location = new System.Drawing.Point(408, 373);
 			this.lblValueTotal.Name = "lblValueTotal";
 			this.lblValueTotal.Size = new System.Drawing.Size(112, 20);
 			this.lblValueTotal.TabIndex = 4;
@@ -303,7 +305,7 @@
 			this.pnl.Location = new System.Drawing.Point(0, 0);
 			this.pnl.Name = "pnl";
 			this.pnl.Padding = new System.Windows.Forms.Padding(10);
-			this.pnl.Size = new System.Drawing.Size(582, 453);
+			this.pnl.Size = new System.Drawing.Size(780, 453);
 			this.pnl.TabIndex = 0;
 			// 
 			// colStock
@@ -333,12 +335,19 @@
 			this.colValue.Name = "colValue";
 			this.colValue.ReadOnly = true;
 			// 
-			// colGain
+			// colNetGain
 			// 
-			this.colGain.HeaderText = "Gain";
-			this.colGain.MinimumWidth = 6;
-			this.colGain.Name = "colGain";
-			this.colGain.ReadOnly = true;
+			this.colNetGain.HeaderText = "Net Gain";
+			this.colNetGain.MinimumWidth = 6;
+			this.colNetGain.Name = "colNetGain";
+			this.colNetGain.ReadOnly = true;
+			// 
+			// colGainRatio
+			// 
+			this.colGainRatio.HeaderText = "Gain to Invest";
+			this.colGainRatio.MinimumWidth = 6;
+			this.colGainRatio.Name = "colGainRatio";
+			this.colGainRatio.ReadOnly = true;
 			// 
 			// colReturn
 			// 
@@ -351,7 +360,7 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 20F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(582, 453);
+			this.ClientSize = new System.Drawing.Size(780, 453);
 			this.Controls.Add(this.pnl);
 			this.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
 			this.Margin = new System.Windows.Forms.Padding(4);
@@ -395,7 +404,8 @@
 		private System.Windows.Forms.DataGridViewTextBoxColumn colShares;
 		private System.Windows.Forms.DataGridViewTextBoxColumn colPrice;
 		private System.Windows.Forms.DataGridViewTextBoxColumn colValue;
-		private System.Windows.Forms.DataGridViewTextBoxColumn colGain;
+		private System.Windows.Forms.DataGridViewTextBoxColumn colNetGain;
+		private System.Windows.Forms.DataGridViewTextBoxColumn colGainRatio;
 		private System.Windows.Forms.DataGridViewTextBoxColumn colReturn;
 	}
 }

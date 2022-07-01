@@ -12,16 +12,16 @@ namespace JP.InvestCalc
 
 		internal Calculator(Database database) => this.database = database;
 
-		public (double NetGain, double YearlyPer1)
+		public (double NetGain, double GainRatio, double YearlyPer1)
 		CalcReturn(string name, double totalValue)
 		{
 			var flows = database.GetFlows(name);
-			var netGain = AddUpCash(flows) + totalValue;
+			var (netGain, gainRatio) = AddUpCash(flows,  totalValue);
 			var yearly = Money.SolveRateInvest(flows, (totalValue, DateTime.Now.Date), PrecisionPer1);
-			return (netGain, yearly);
+			return (netGain, gainRatio, yearly);
 		}
 
-		internal (double NetGain, double YearlyPer1)?
+		internal (double NetGain, double GainToInvest, double YearlyPer1)?
 		CalcReturn(Stock stk)
 		{
 			if(stk.IsValueKnown(out var totalValue))
@@ -36,13 +36,23 @@ namespace JP.InvestCalc
 				(totalValue, DateTime.Today.Date), PrecisionPer1);
 		}
 
-		private double AddUpCash(List<(double Cash, DateTime Day)> flows)
+		private (double NetGain, double GainRatio)
+		AddUpCash(List<(double Cash, DateTime Day)> flows, double presentValue)
 		{
-			double total = 0;
-			for(int i = 0; i < flows.Count; i++)
-				total += flows[i].Cash;
+			double
+				gain = presentValue,
+				invest = 0;
 
-			return total;
+			for(int i = 0; i < flows.Count; i++)
+			{
+				var cash = flows[i].Cash;
+				if(cash > 0)
+					gain += cash;
+				else
+					invest -= cash;
+			}
+			var net = gain - invest;
+			return (net, net / invest);
 		}
 	}
 }

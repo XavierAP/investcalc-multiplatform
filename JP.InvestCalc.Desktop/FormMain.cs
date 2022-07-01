@@ -18,7 +18,8 @@ namespace JP.InvestCalc
 			table.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
 			colStock.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
 			colValue.DefaultCellStyle.Format =
-			colGain.DefaultCellStyle.Format = "N2";
+			colNetGain.DefaultCellStyle.Format = "N2";
+			colGainRatio.DefaultCellStyle.Format =
 			colReturn.DefaultCellStyle.Format = "P2";
 
 			UpdateTime();
@@ -40,18 +41,18 @@ namespace JP.InvestCalc
 		}
 
 		void PortfolioView.AddStock(string name, double shares,
-			(double NetGain, double YearlyPer1)? info)
+			(double NetGain, double GainRatio, double YearlyPer1)? info)
 		{
 			if(info.HasValue)
-				table.Rows.Add(name, shares, null, null, info.Value.NetGain, info.Value.YearlyPer1);
+				table.Rows.Add(name, shares, null, null, info.Value.NetGain, info.Value.GainRatio, info.Value.YearlyPer1);
 			else
-				table.Rows.Add(name, shares, null, null, null, null);
+				table.Rows.Add(name, shares, null, null, null, null, null);
 
 			txtReturnAvg.Text = null;
 		}
 
 		void PortfolioView.SetStockFigures(Stock stk,
-			(double NetGain, double YearlyPer1)? info)
+			(double NetGain, double GainRatio, double YearlyPer1)? info)
 		{
 			var irow = GetRow(stk.Name);
 			GetCell(irow, colShares).Value = stk.Shares;
@@ -67,11 +68,14 @@ namespace JP.InvestCalc
 			}
 			if(info.HasValue)
 			{
-				GetCell(irow, colGain  ).Value = info.Value.NetGain;
+				GetCell(irow, colNetGain).Value = info.Value.NetGain;
+				GetCell(irow, colGainRatio).Value = info.Value.GainRatio;
 				GetCell(irow, colReturn).Value = info.Value.YearlyPer1;
 			}
 			else
 			{
+				GetCell(irow, colNetGain).Value =
+				GetCell(irow, colGainRatio).Value =
 				GetCell(irow, colReturn).Value = null;
 			}
 			TryCalcReturnAvg(table.Rows);
@@ -126,9 +130,10 @@ namespace JP.InvestCalc
 				GetCell(irow, colValue).Value = total;
 				var stockName = (string)GetCell(irow, colStock).Value;
 
-				var (gain, yearly) = Model.Calculator.CalcReturn(stockName, total);
-				GetCell(irow, colGain).Value = gain;
-				GetCell(irow, colReturn).Value = yearly;
+				var info = Model.Calculator.CalcReturn(stockName, total);
+				GetCell(irow, colNetGain).Value = info.NetGain;
+				GetCell(irow, colGainRatio).Value = info.GainRatio;
+				GetCell(irow, colReturn).Value = info.YearlyPer1;
 			}
 			else ea.Cancel = true;
 
