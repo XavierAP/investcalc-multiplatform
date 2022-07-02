@@ -16,7 +16,7 @@ namespace JP.InvestCalc
 		CalcReturn(string name, double totalValue)
 		{
 			var flows = database.GetFlows(name);
-			var (netGain, gainRatio) = AddUpCash(flows,  totalValue);
+			var (netGain, gainRatio) = CalculateGain(flows,  totalValue);
 			var yearly = Money.SolveRateInvest(flows, (totalValue, DateTime.Now.Date), PrecisionPer1);
 			return (netGain, gainRatio, yearly);
 		}
@@ -37,22 +37,19 @@ namespace JP.InvestCalc
 		}
 
 		private (double NetGain, double GainRatio)
-		AddUpCash(List<(double Cash, DateTime Day)> flows, double presentValue)
+		CalculateGain(List<(double Cash, DateTime Day)> flows, double presentValue)
 		{
 			double
-				gain = presentValue,
-				invest = 0;
+				net = 0,
+				min = 0;
 
 			for(int i = 0; i < flows.Count; i++)
 			{
-				var cash = flows[i].Cash;
-				if(cash > 0)
-					gain += cash;
-				else
-					invest -= cash;
+				net += flows[i].Cash;
+				if(net < min) min = net;
 			}
-			var net = gain - invest;
-			return (net, net / invest);
+			net += presentValue;
+			return (net, - net / min);
 		}
 	}
 }
