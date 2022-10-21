@@ -6,8 +6,8 @@ Desktop and mobile apps sharing same back-end source code (.NET and Xamarin).
 
 ![Screenshot](https://i.postimg.cc/9fwXdB82/Invest-Calc-0.png "Example of main screen, on Android environment")
 ![Screenshot](https://i.postimg.cc/tThXf4Gm/Invest-Calc-1.png "Stock menu, on Android environment")
-![Screenshot](https://i.postimg.cc/q0svTDTp/Invest-Calc-2.png "Main options, on Android environment")
-![Screenshot](https://i.postimg.cc/LmX9jHZs/Invest-Calc-3.png "History of buy/sell/dividend/cost operations, on Android environment")
+![Screenshot](https://i.postimg.cc/m2rs3wkn/Invest-Calc-2.png "Main options, on Android environment")
+![Screenshot](https://i.postimg.cc/Cx3pgp7y/Invest-Calc-3.png "History of buy/sell/dividend/cost operations, on Android environment")
 
 ## Features
 * Register orders
