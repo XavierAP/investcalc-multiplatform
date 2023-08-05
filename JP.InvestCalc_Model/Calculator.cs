@@ -43,6 +43,7 @@ namespace JP.InvestCalc
 		{
 			return CalculateGain(presentValue, from f in flows select f.Cash);
 		}
+
 		public static (double NetGain, double GainRatio) CalculateGain(
 			double presentValue,
 			IEnumerable<double> cashFlows)
@@ -57,6 +58,7 @@ namespace JP.InvestCalc
 			}
 			return CalculateGain(net.GetResult(), minimumNet.GetResult());
 		}
+
 		private static (double NetGain, double GainRatio)
 		CalculateGain(double netFlow, double minimumNetOverTime)
 		{
