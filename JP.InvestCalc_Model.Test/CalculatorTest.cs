@@ -5,7 +5,8 @@
 	{
 		const double tolerance = 1e-9;
 
-		[TestCase(1_001.00, new double[] { -1_000.00 }, 1.00, 0.001)]
+		[TestCase(1_001.00, new double[] { -1_000 }, 1.00, 0.001)]
+		[TestCase(  500.00, new double[] { -1_000, 250 }, -250.00, -0.25)]
 
 		public void CalculateGain(double presentValue, IEnumerable<double> cashFlows,
 			double expectedGain, double expectedRatio)
