@@ -1,6 +1,7 @@
 ﻿namespace JP.InvestCalc
 {
-	[TestFixture(TestOf = typeof(Calculator))] class CalculatorTest
+	[TestFixture(TestOf = typeof(Calculator))]
+	class CalculatorTest
 	{
 		const double tolerance = 1e-9;
 
