@@ -17,3 +17,5 @@ dotnet_diagnostic.IDE0071.severity = silent
 
 csharp_style_deconstructed_variable_declaration = false:suggestion
 csharp_prefer_simple_using_statement = false:suggestion
+dotnet_naming_rule.non_field_members_should_be_pascal_case.severity = silent
+dotnet_diagnostic.NUnit2045.severity = silent

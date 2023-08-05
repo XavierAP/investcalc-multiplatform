@@ -1,6 +1,8 @@
 ﻿using JP.Maths;
+using JP.Maths.Statistics;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace JP.InvestCalc
 {
@@ -16,7 +18,7 @@ namespace JP.InvestCalc
 		CalcReturn(string name, double totalValue)
 		{
 			var flows = database.GetFlows(name);
-			var (netGain, gainRatio) = CalculateGain(flows,  totalValue);
+			var (netGain, gainRatio) = CalculateGain(totalValue, flows);
 			var yearly = Money.SolveRateInvest(flows, (totalValue, DateTime.Now.Date), PrecisionPer1);
 			return (netGain, gainRatio, yearly);
 		}
@@ -36,20 +38,30 @@ namespace JP.InvestCalc
 				(totalValue, DateTime.Today.Date), PrecisionPer1);
 		}
 
-		private (double NetGain, double GainRatio)
-		CalculateGain(List<(double Cash, DateTime Day)> flows, double presentValue)
+		public static (double NetGain, double GainRatio) CalculateGain(
+			double presentValue,
+			IEnumerable<(double Cash, DateTime Day)> flows)
 		{
-			double
-				net = 0,
-				min = 0;
+			return CalculateGain(presentValue, from f in flows select f.Cash);
+		}
 
-			for(int i = 0; i < flows.Count; i++)
+		public static (double NetGain, double GainRatio) CalculateGain(
+			double presentValue,
+			IEnumerable<double> cashFlows)
+		{
+			var stats = new Maths.Statistics.BatchAggregator();
+			var net = stats.Add<Sum>();
+			var min = stats.Add<Min>();
+
+			foreach (var flow in cashFlows)
 			{
-				net += flows[i].Cash;
-				if(net < min) min = net;
+				stats.Aggregate(flow);
 			}
-			net += presentValue;
-			return (net, - net / min);
+			var minResult = min.GetResult();
+			stats.Aggregate(presentValue);
+			var netResult = net.GetResult();
+			
+			return (netResult, - netResult / minResult);
 		}
 	}
 }
