@@ -1,5 +1,4 @@
 ﻿using JP.Maths;
-using JP.Maths.Statistics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,19 +48,15 @@ namespace JP.InvestCalc
 			double presentValue,
 			IEnumerable<double> cashFlows)
 		{
-			var stats = new Maths.Statistics.BatchAggregator();
-			var net = stats.Add<Sum>();
-			var min = stats.Add<Min>();
+			var net = new Maths.Statistics.Sum();
+			var minimumNet = new Maths.Statistics.Min();
 
-			foreach (var flow in cashFlows)
+			foreach (var flow in cashFlows.Append(presentValue))
 			{
-				stats.Aggregate(flow);
+				net.Aggregate(flow);
+				minimumNet.Aggregate(net.GetResult());
 			}
-			var minResult = min.GetResult();
-			stats.Aggregate(presentValue);
-			var netResult = net.GetResult();
-			
-			return (netResult, - netResult / minResult);
+			return (net.GetResult(), - net.GetResult() / minimumNet.GetResult());
 		}
 	}
 }
