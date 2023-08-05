@@ -46,21 +46,16 @@ namespace JP.InvestCalc
 		public static (double NetGain, double GainRatio)
 		CalculateGain(double presentValue, IEnumerable<double> cashFlows)
 		{
-			var net = new Maths.Statistics.Sum();
-			var minimumNet = new Maths.Statistics.Min();
+			double
+				netFlow = 0,
+				totalInvested = 0;
 
 			foreach (var flow in cashFlows.Append(presentValue))
 			{
-				net.Aggregate(flow);
-				minimumNet.Aggregate(net.GetResult());
+				netFlow += flow;
+				if (flow < 0) totalInvested += flow;
 			}
-			return CalculateGain(net.GetResult(), minimumNet.GetResult());
-		}
-
-		private static (double NetGain, double GainRatio)
-		CalculateGain(double netFlow, double minimumNetOverTime)
-		{
-			return (netFlow, - netFlow / minimumNetOverTime);
+			return (netFlow, - netFlow / totalInvested);
 		}
 	}
 }
