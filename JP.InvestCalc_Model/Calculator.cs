@@ -37,16 +37,14 @@ namespace JP.InvestCalc
 				(totalValue, DateTime.Today.Date), PrecisionPer1);
 		}
 
-		public static (double NetGain, double GainRatio) CalculateGain(
-			double presentValue,
-			IEnumerable<(double Cash, DateTime Day)> flows)
+		public static (double NetGain, double GainRatio)
+		CalculateGain(double presentValue, IEnumerable<(double Cash, DateTime Day)> flows)
 		{
 			return CalculateGain(presentValue, from f in flows select f.Cash);
 		}
 
-		public static (double NetGain, double GainRatio) CalculateGain(
-			double presentValue,
-			IEnumerable<double> cashFlows)
+		public static (double NetGain, double GainRatio)
+		CalculateGain(double presentValue, IEnumerable<double> cashFlows)
 		{
 			var net = new Maths.Statistics.Sum();
 			var minimumNet = new Maths.Statistics.Min();
