@@ -12,7 +12,7 @@ namespace JP.InvestCalc
 {
 	internal sealed class PageMain : ContentPage, PortfolioView
 	{
-		private readonly ModelGateway model = new ModelGateway(
+		readonly ModelGateway model = new ModelGateway(
 			Config.GetDataFolder(), GetPriceAPILicense());
 
 		readonly StackLayout flipLayout = new StackLayout();
@@ -30,7 +30,7 @@ namespace JP.InvestCalc
 			btnHistory  = new Button { Text = "History" },
 			btnOptions  = new Button { Text = "Options" };
 
-		private readonly Dictionary<string, (Label Shares, Label Price, Label Total, Label NetGain, Label GainRatio, Label Yearly)>
+		readonly Dictionary<string, (Label Shares, Label Price, Label Total, Label NetGain, Label GainRatio, Label Yearly)>
 		stockIndex = new Dictionary<string, (Label Shares, Label Price, Label Total, Label NetGain, Label GainRatio, Label Yearly)>();
 		
 		readonly RowDefinition layoutRowHeader = new RowDefinition { Height = GridLength.Auto };
@@ -57,7 +57,7 @@ namespace JP.InvestCalc
 			RefreshPortfolio();
 		}
 
-		private static void ConstructLayouts(
+		static void ConstructLayouts(
 			out ColumnDefinitionCollection layoutCols,
 			out Grid buttonsLayoutOnPortrait,
 			out Grid buttonsLayoutOnLandscape)
@@ -78,7 +78,7 @@ namespace JP.InvestCalc
 			};
 		}
 
-		private void SetButtonEvents()
+		void SetButtonEvents()
 		{
 			btnOptions.Clicked += PromptOptions;
 
@@ -88,7 +88,7 @@ namespace JP.InvestCalc
 				PageOperation.BuyNewStock(model.Portfolio, this));
 		}
 
-		private View CreateStocksView() => new ScrollView
+		View CreateStocksView() => new ScrollView
 		{
 			Content = stocksLayout,
 			HorizontalOptions = LayoutOptions.FillAndExpand,
@@ -96,7 +96,7 @@ namespace JP.InvestCalc
 			Padding = 10,
 		};
 
-		private View CreateAverageReturnView()
+		View CreateAverageReturnView()
 		{
 			var view = new Grid { ColumnDefinitions = layoutCols };
 			view.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
@@ -113,7 +113,7 @@ namespace JP.InvestCalc
 		}
 
 		
-		private void OnOrientationSetOrChanged(Orientation orientation)
+		void OnOrientationSetOrChanged(Orientation orientation)
 		{
 			ResetLayout();
 			if(Orientation.Landscape == orientation)
@@ -123,7 +123,7 @@ namespace JP.InvestCalc
 		}
 
 
-		private void RefreshPortfolio()
+		void RefreshPortfolio()
 		{
 			stockIndex.Clear();
 			stocksLayout.Children.Clear();
@@ -217,7 +217,7 @@ namespace JP.InvestCalc
 			TryCalcReturnAvg();
 		}
 
-		private static Label AddCell(string caption, Grid stockGrid, int icol, int irow)
+		static Label AddCell(string caption, Grid stockGrid, int icol, int irow)
 		{
 			stockGrid.Children.Add(new Label
 			{
@@ -232,7 +232,7 @@ namespace JP.InvestCalc
 		}
 
 		
-		private void PrepareLayouts()
+		void PrepareLayouts()
 		{
 			// Portrait:
 			buttonsLayoutOnPortrait.RowDefinitions.Add(layoutRowOther);
@@ -244,7 +244,7 @@ namespace JP.InvestCalc
 				buttonsLayoutOnLandscape.RowDefinitions.Add(layoutRow);
 		}
 
-		private void ResetLayout()
+		void ResetLayout()
 		{
 			buttonsLayoutOnPortrait.Children.Clear();
 			buttonsLayoutOnLandscape.Children.Clear();
@@ -252,7 +252,7 @@ namespace JP.InvestCalc
 			flipLayout.Children.Remove(buttonsLayoutOnLandscape);
 		}
 
-		private void SetLayoutPortrait()
+		void SetLayoutPortrait()
 		{
 			btnBuy.Text = "Buy new";
 
@@ -269,7 +269,7 @@ namespace JP.InvestCalc
 			flipLayout.Orientation = StackOrientation.Vertical;
 		}
 
-		private void SetLayoutLandscape()
+		void SetLayoutLandscape()
 		{
 			btnBuy.Text = "Buy\nnew";
 
@@ -287,7 +287,7 @@ namespace JP.InvestCalc
 		}
 
 
-		private async Task TrySetPrice(string stockName, string priceInput)
+		async Task TrySetPrice(string stockName, string priceInput)
 		{
 			bool isInputValid = double.TryParse(priceInput, out var price);
 			if(!isInputValid || price < 0)
@@ -310,7 +310,7 @@ namespace JP.InvestCalc
 			TryCalcReturnAvg();
 		}
 
-		private void TryCalcReturnAvg()
+		void TryCalcReturnAvg()
 		{
 			double total = 0;
 			foreach(var stk in model.Portfolio.Values)
@@ -328,7 +328,7 @@ namespace JP.InvestCalc
 			averageReturn.Value.Text = model.Calculator.CalcReturnAvg(GetAllStockNames(), total).FormatPerCent();
 		}
 
-		private async void PromptStockActions(string stockName)
+		async void PromptStockActions(string stockName)
 		{
 			var option = await DisplayActionSheet(stockName, "Cancel", null,
 				Operation.Buy.Text,
@@ -377,7 +377,7 @@ namespace JP.InvestCalc
 			}
 		}
 
-		private async Task DisplayHistory(params string[] stockNames)
+		async Task DisplayHistory(params string[] stockNames)
 		{
 			var history = new PageHistory(model.Data.GetFlowEditor(), stockNames);
 			history.Disappearing += (s,e) =>
@@ -388,7 +388,7 @@ namespace JP.InvestCalc
 			await Navigation.PushModalAsync(history);
 		}
 
-		private async void PromptOptions(object sender, EventArgs ea)
+		async void PromptOptions(object sender, EventArgs ea)
 		{
 			var option = await DisplayActionSheet("Options", "Cancel", null,
 				"Export data file",
@@ -413,12 +413,12 @@ namespace JP.InvestCalc
 			}
 		}
 
-		private Task ExportDataFile() => Share.RequestAsync(new ShareFileRequest
+		Task ExportDataFile() => Share.RequestAsync(new ShareFileRequest
 		{
 			File = new ShareFile(model.Data.FilePath, "application/octet-stream")
 		});
 
-		private async Task ImportDataFile()
+		async Task ImportDataFile()
 		{
 			var file = await FilePicker.PickAsync();
 			if(file == null) return;
@@ -431,7 +431,7 @@ namespace JP.InvestCalc
 		}
 		
 
-		private async Task SearchStocks()
+		async Task SearchStocks()
 		{
 			await this.PromptAndAct(ShowSearchResults, "Search stocks", "Enter search term:");
 			async Task ShowSearchResults(string keyword)
@@ -448,14 +448,14 @@ namespace JP.InvestCalc
 		}
 
 
-		private async Task SetPriceAPILicense(string license)
+		async Task SetPriceAPILicense(string license)
 		{
 			File.WriteAllText(GetAPILicenseFileName(), license);
 			model.ApiLicenseKey = license;
 			RefreshPortfolio();
 		}
 
-		private static string GetPriceAPILicense()
+		static string GetPriceAPILicense()
 		{
 			var pathName = GetAPILicenseFileName();
 			if(!File.Exists(pathName)) return null;
@@ -463,9 +463,9 @@ namespace JP.InvestCalc
 			return File.ReadAllText(pathName).Trim();
 		}
 
-		private static string GetAPILicenseFileName() => Path.Combine(
+		static string GetAPILicenseFileName() => Path.Combine(
 			Config.GetDataFolder(), "api-license.txt");
 
-		private string[] GetAllStockNames() => stockIndex.Keys.ToArray();
+		string[] GetAllStockNames() => stockIndex.Keys.ToArray();
 	}
 }
