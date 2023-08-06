@@ -199,7 +199,7 @@ create table Stocks ( -- Portfolio of stocks, shares, bonds, metals, etc.
 create table Flows ( -- Record of purchases, sales, dividends, holding costst, etc.
 	utcDate integer not null,
 	stock integer not null references Stocks(id)
-		on delete restrict on update cascade,
+		on delete cascade on update cascade,
 	shares real not null, -- Amount of shares acquired (+) or sold or forfeit (-). May be non integer in case of e.g. physical metals.
 	flow real not null, -- Money received (+) or paid (-); in principle opposite sign to 'shares'.
 	comment text
