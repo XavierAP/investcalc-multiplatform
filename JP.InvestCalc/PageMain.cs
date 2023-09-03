@@ -17,7 +17,10 @@ namespace JP.InvestCalc
 
 		readonly StackLayout flipLayout = new StackLayout();
 		readonly StackLayout stocksLayout = new StackLayout();
-
+		
+		readonly (Label Tag, Label Value) totalValue = (
+			new Label { HorizontalTextAlignment = TextAlignment.End }.SetFontSizeMediumSmall(),
+			new Label { HorizontalTextAlignment = TextAlignment.Start }.SetFontSizeMediumSmall());
 		readonly (Label Tag, Label Value) averageReturn = (
 			new Label { HorizontalTextAlignment = TextAlignment.End }.SetFontSizeMediumSmall(),
 			new Label { HorizontalTextAlignment = TextAlignment.Start }.SetFontSizeMediumSmall());
@@ -47,7 +50,7 @@ namespace JP.InvestCalc
 			flipLayout.BackgroundColor = Format.BackgroundColor;
 
 			var verticalLayout = new StackLayout { HorizontalOptions = LayoutOptions.FillAndExpand };
-			verticalLayout.Children.Add(CreateAverageReturnView());
+			verticalLayout.Children.Add(CreateAggregateView());
 			verticalLayout.Children.Add(CreateStocksView());
 			flipLayout.Children.Add(verticalLayout);
 
@@ -96,18 +99,17 @@ namespace JP.InvestCalc
 			Padding = 10,
 		};
 
-		View CreateAverageReturnView()
+		View CreateAggregateView()
 		{
 			var view = new Grid { ColumnDefinitions = layoutCols };
 			view.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 			const int row = 0;
 			int col = 0;
-
-			view.Children.Add(averageReturn.Tag,
-				col, col+=2, row, row+1);
-
-			view.Children.Add(averageReturn.Value,
-				col, layoutCols.Count, row, row+1);
+			
+			view.Children.Add(totalValue.Tag,      col, ++col, row, row+1);
+			view.Children.Add(totalValue.Value,    col, ++col, row, row+1);
+			view.Children.Add(averageReturn.Tag,   col, ++col, row, row+1);
+			view.Children.Add(averageReturn.Value, col, ++col, row, row+1);
 
 			return view;
 		}
@@ -324,7 +326,9 @@ namespace JP.InvestCalc
 					return;
 				}
 			}
-			averageReturn.Tag.Text = "Average return:";
+			totalValue.Tag.Text = "Total value:";
+			totalValue.Value.Text = total.FormatMoneyPositive();
+			averageReturn.Tag.Text = "Avg. return:";
 			averageReturn.Value.Text = model.Calculator.CalcReturnAvg(GetAllStockNames(), total).FormatPerCent();
 		}
 
