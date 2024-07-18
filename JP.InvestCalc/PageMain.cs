@@ -12,8 +12,7 @@ namespace JP.InvestCalc
 {
 	internal sealed class PageMain : ContentPage, PortfolioView
 	{
-		readonly ModelGateway model = new ModelGateway(
-			Config.GetDataFolder(), GetPriceAPILicense());
+		readonly ModelGateway model = new ModelGateway(Config.GetDataFolder(), GetPriceAPILicense());
 
 		readonly StackLayout flipLayout = new StackLayout();
 		readonly StackLayout stocksLayout = new StackLayout();
@@ -118,6 +117,7 @@ namespace JP.InvestCalc
 		void OnOrientationSetOrChanged(Orientation orientation)
 		{
 			ResetLayout();
+
 			if(Orientation.Landscape == orientation)
 				SetLayoutLandscape();
 			else
@@ -467,8 +467,7 @@ namespace JP.InvestCalc
 			return File.ReadAllText(pathName).Trim();
 		}
 
-		static string GetAPILicenseFileName() => Path.Combine(
-			Config.GetDataFolder(), "api-license.txt");
+		static string GetAPILicenseFileName() => Path.Combine(Config.GetDataFolder(), "api-license.txt");
 
 		string[] GetAllStockNames() => stockIndex.Keys.ToArray();
 	}
