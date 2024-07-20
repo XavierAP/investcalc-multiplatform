@@ -37,7 +37,7 @@ namespace JP.InvestCalc
 				"expected two lines, headers and values.");
 
 			var pos = table.Headers().IndexOf("price");
-			return double.Parse(table.Row(1)[pos]);
+			return double.Parse(table.Row(1)[pos], System.Globalization.CultureInfo.InvariantCulture);
 		}
 	}
 }
