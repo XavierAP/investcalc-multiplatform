@@ -6,7 +6,7 @@ Windows Forms desktop interface:
 
 ![Screenshot](https://i.postimg.cc/zGWbYDp2/Invest-Calc.png "Example of main window, on Windows environment")
 
-Mobile Android interface:
+Mobile interface:
 
 ![Screenshot](https://i.postimg.cc/9fwXdB82/Invest-Calc-0.png "Example of main screen, on Android environment")
 ![Screenshot](https://i.postimg.cc/tThXf4Gm/Invest-Calc-1.png "Stock menu, on Android environment")
